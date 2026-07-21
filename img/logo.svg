@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 176 40" width="352" height="80">
+  <!-- Panvia logo-lockup: merkteken + woordmerk.
+       Woordmerk hoort in Fraunces 600; valt terug op Georgia/serif
+       waar Fraunces niet geïnstalleerd is. Kleuren: Ultramarijn #2438D8
+       en Nacht #0E1230. Witte variant: beide vullen met #FFFFFF. -->
+  <g transform="translate(4 4)">
+    <path d="M21 3 H3 V29 H29 V11" fill="none" stroke="#2438D8" stroke-width="3"/>
+    <path d="M10 22 L23 9" fill="none" stroke="#2438D8" stroke-width="3"/>
+    <circle cx="24.5" cy="7.5" r="3.5" fill="#2438D8"/>
+  </g>
+  <text x="46" y="27" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-weight="600" font-size="24" fill="#0E1230">Panvia</text>
+  <text x="46" y="36" font-family="'IBM Plex Mono', Consolas, monospace" font-weight="500" font-size="6" letter-spacing="0.5" fill="#575E7B">VASTGOED IN EIGEN HAND.</text>
+</svg>

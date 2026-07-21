@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="128" height="128">
+  <!-- Panvia merkteken: de plattegrond met de open hoek.
+       Het vierkant = het pand, de open hoek = de deur die Panvia openzet,
+       de lijn = de route (via), de punt = de koper. -->
+  <path d="M21 3 H3 V29 H29 V11" fill="none" stroke="#2438D8" stroke-width="3"/>
+  <path d="M10 22 L23 9" fill="none" stroke="#2438D8" stroke-width="3"/>
+  <circle cx="24.5" cy="7.5" r="3.5" fill="#2438D8"/>
+</svg>
