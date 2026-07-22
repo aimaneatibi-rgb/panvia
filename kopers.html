@@ -130,8 +130,13 @@
         <div class="sectie-kop">
           <span class="kop-label">Word lid</span>
           <h2>Begin met zoeken — en praten</h2>
-          <p>Je maakt in één stap een kopersabonnement aan van <span class="tnum js-koper-fee">€ 12,95</span> per maand. Daarna praat, bied en zie je alles op elk pand.</p>
+          <p>Twee stappen: je gegevens en direct afrekenen. Pas ná de betaling is je account actief — daarna praat, bied en zie je alles op elk pand.</p>
         </div>
+        <ol id="kopers-indicator" class="stap-indicator" aria-label="Voortgang">
+          <li aria-current="step"><span class="bol" aria-hidden="true">1</span>Je gegevens</li>
+          <li><span class="bol" aria-hidden="true">2</span>Betalen</li>
+          <li><span class="bol" aria-hidden="true">3</span>Klaar</li>
+        </ol>
         <div class="formulier-paneel" id="kopers-aanmeld-blok">
           <form id="kopers-form" novalidate>
             <div class="veld">
@@ -152,9 +157,10 @@
               </label>
               <p class="fout" role="alert"></p>
             </div>
-            <button type="submit" class="btn btn-primair">Word lid — <span class="js-koper-fee">€ 12,95</span> per maand</button>
+            <button type="submit" class="btn btn-primair">Naar betalen — <span class="js-koper-fee">€ 12,95</span> per maand</button>
             <p class="klein grijs" style="margin: 16px 0 0;">Zoeken en kijken blijft gratis. Prototype: er wordt niets afgeschreven.</p>
           </form>
+          <div id="kopers-checkout" hidden></div>
         </div>
       </div>
     </section>
@@ -197,7 +203,7 @@
       </div>
       <p class="footer-groot" aria-hidden="true">Panvia</p>
       <div class="footer-onder">
-        <span>© 2026 Panvia</span>
+        <span>© 2026 Panvia · Gemaakt &amp; beheerd door <a href="https://kaelo-consulting.com" target="_blank" rel="noopener">Kaelo Consulting</a></span>
         <span>Panvia is geen makelaar.</span>
       </div>
     </div>

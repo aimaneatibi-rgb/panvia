@@ -44,7 +44,7 @@ var PANVIA_CONFIG = {
              je verzamelt aanbod zonder al te hoeven afrekenen.
      false = normale stand: direct plaatsen en betalen.
      ---------------------------------------------------------------------- */
-  lanceringsModus: true,
+  lanceringsModus: false,
 
   /* ----------------------------------------------------------------------
      4. LANCERINGSDATUM

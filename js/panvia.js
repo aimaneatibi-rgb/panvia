@@ -553,8 +553,7 @@
       });
     } else {
       slot.innerHTML =
-        "<a href='inloggen.html'>Inloggen</a>" +
-        "<a class='nav-account-maak' href='inloggen.html#maken'>Account maken</a>";
+        "<a href='inloggen.html'>Inloggen</a>";
     }
   }
 
@@ -815,7 +814,83 @@
   }
 
   /* ------------------------------------------------------------------------
-     Pagina: kopers — het kopersabonnement afsluiten (€ 12,95 p/m)
+     Mollie-checkout — GESIMULEERD, maar bewust zo gebouwd dat de echte
+     Mollie-integratie hier 1-op-1 in past ("Mollie-ready"). Zowel de koper
+     (abonnement € 12,95/mnd) als de verkoper (eenmalig € 895) lopen hier
+     langs: een account/plaatsing ontstaat PAS nadat de betaling is geslaagd.
+
+     ▸ ZO WORDT DIT ECHTE MOLLIE (een backend is nodig — een statische site
+       kan het niet, want de Mollie-key moet geheim server-side blijven):
+       1. Backend-route (bv. Vercel serverless): POST /api/mollie/create-payment
+          - eenmalig (verkoper): mollie.payments.create({ amount, description,
+            redirectUrl, webhookUrl }) met de GEHEIME live/test-key.
+          - abonnement (koper): eerste betaling + mandaat, daarna
+            mollie.customers.create + mollie.customerPayments/subscriptions
+            voor de maandelijkse € 12,95.
+          - antwoord: payment.getCheckoutUrl().
+       2. Frontend: window.location = checkoutUrl  → Mollie hosted checkout.
+       3. Mollie roept je webhook (/api/mollie/webhook) met de payment-id;
+          de server haalt de status op en zet in de database: betaald = true.
+       4. Na terugkeer (redirectUrl) verifieert de server de status server-side
+          en pas DÁN wordt het account/de plaatsing echt aangemaakt.
+     De twee functies hieronder simuleren stap 2–4 (methode kiezen →
+     "verwerken" → betaald). Vervang ze door bovenstaande calls en de rest
+     van de flow blijft ongewijzigd.
+     ------------------------------------------------------------------------ */
+  function mollieVerwerk(container, onBetaald) {
+    container.innerHTML =
+      "<div class='mollie'>" +
+        "<div class='mollie-balk'><span class='mollie-slot'>🔒 Beveiligde betaling</span><span>Mollie</span></div>" +
+        "<div class='mollie-verwerkt'>" +
+          "<div class='mollie-spinner' aria-hidden='true'></div>" +
+          "<p role='status'>Je betaling wordt verwerkt…</p>" +
+        "</div>" +
+      "</div>";
+    /* MOLLIE-READY: hier zou je zijn teruggekeerd van de hosted checkout en
+       verifieer je de status server-side vóór je onBetaald aanroept. */
+    if (wilBeweging()) { setTimeout(onBetaald, 1300); } else { onBetaald(); }
+  }
+
+  function mollieCheckout(container, opts) {
+    /* opts: { bedrag, periode, omschrijving, knopLabel, klein, onTerug, onBetaald } */
+    var banken = ["ABN AMRO", "ASN Bank", "bunq", "ING", "Knab", "Rabobank", "Revolut", "SNS", "Triodos Bank"];
+    container.innerHTML =
+      "<div class='mollie'>" +
+        "<div class='mollie-balk'><span class='mollie-slot'>🔒 Beveiligde betaling</span><span>Mollie</span></div>" +
+        "<div class='mollie-body'>" +
+          "<p class='mollie-bedrag tnum'>" + escapeHTML(opts.bedrag) + "</p>" +
+          "<p class='mollie-omschrijving'>" + escapeHTML(opts.omschrijving) + (opts.periode ? " · " + escapeHTML(opts.periode) : "") + "</p>" +
+          "<div class='mollie-methodes' role='radiogroup' aria-label='Betaalmethode'>" +
+            "<label class='radio-optie'><input type='radio' name='mollie-methode' value='ideal' checked> iDEAL</label>" +
+            "<label class='radio-optie'><input type='radio' name='mollie-methode' value='creditcard'> Creditcard</label>" +
+            "<label class='radio-optie'><input type='radio' name='mollie-methode' value='bancontact'> Bancontact</label>" +
+          "</div>" +
+          "<div class='veld mollie-bank' id='mollie-bank-wrap'>" +
+            "<label for='mollie-bank'>Je bank</label>" +
+            "<select id='mollie-bank' style='max-width:240px'>" + banken.map(function (b) { return "<option>" + b + "</option>"; }).join("") + "</select>" +
+          "</div>" +
+          "<button type='button' class='btn btn-primair' id='mollie-betaal'>" + escapeHTML(opts.knopLabel || ("Betaal " + opts.bedrag)) + "</button>" +
+          (opts.onTerug ? "<button type='button' class='btn btn-tertiair' id='mollie-terug' style='width:100%;margin-top:12px'>Ga terug</button>" : "") +
+          (opts.klein ? "<p class='mollie-klein'>" + opts.klein + "</p>" : "") +
+        "</div>" +
+      "</div>";
+    var bankWrap = $("#mollie-bank-wrap", container);
+    $all("input[name='mollie-methode']", container).forEach(function (r) {
+      r.addEventListener("change", function () {
+        var gekozen = $("input[name='mollie-methode']:checked", container);
+        bankWrap.hidden = !(gekozen && gekozen.value === "ideal");
+      });
+    });
+    $("#mollie-betaal", container).addEventListener("click", function () {
+      mollieVerwerk(container, opts.onBetaald);
+    });
+    var terug = $("#mollie-terug", container);
+    if (terug && opts.onTerug) terug.addEventListener("click", opts.onTerug);
+  }
+
+  /* ------------------------------------------------------------------------
+     Pagina: kopers — doorloop: (1) je gegevens → (2) betalen via Mollie →
+     (3) klaar. Het kopersaccount ontstaat PAS na een geslaagde betaling.
      ------------------------------------------------------------------------ */
   function initKopers() {
     var blok = $("#kopers-aanmeld-blok");
@@ -824,9 +899,23 @@
     var prijsEls = $all(".js-koper-fee");
     prijsEls.forEach(function (el) { el.textContent = KOPER_FEE; });
 
-    /* Al lid? Toon dat, in plaats van het formulier. */
+    var indicator = $("#kopers-indicator");
+    function zetStap(n) {
+      if (!indicator) return;
+      $all("li", indicator).forEach(function (li, i) {
+        var nr = i + 1;
+        li.classList.toggle("klaar", nr < n);
+        if (nr === n) li.setAttribute("aria-current", "step");
+        else li.removeAttribute("aria-current");
+        var bol = li.querySelector(".bol");
+        if (bol) bol.textContent = nr < n ? "✓" : String(nr);
+      });
+    }
+
+    /* Al lid? Toon dat, in plaats van de doorloop. */
     var bestaand = koperAccount();
     if (bestaand && bestaand.betaald) {
+      zetStap(3);
       blok.innerHTML =
         "<div class='bevestiging'>" +
           "<div class='vink' aria-hidden='true'>✓</div>" +
@@ -839,7 +928,22 @@
     }
 
     var form = $("#kopers-form");
-    if (!form) return;
+    var checkout = $("#kopers-checkout");
+    if (!form || !checkout) return;
+
+    function toonWelkom() {
+      checkout.innerHTML =
+        "<div class='bevestiging'>" +
+          "<div class='vink' aria-hidden='true'>✓</div>" +
+          "<h2>Betaald. Je bent nu lid.</h2>" +
+          "<p class='grijs'>Je betaling is gelukt en je account is actief. Vanaf nu praat je op elk pand rechtstreeks met de eigenaar, doe je biedingen en zie je de volledige verkoperinformatie. Je betaalt " + KOPER_FEE + " per maand en zegt elke maand met één klik op.</p>" +
+          "<p class='klein grijs'>Prototype: er wordt niets afgeschreven en je gegevens worden niet doorverkocht — aan niemand, ooit.</p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+        "</div>";
+      zetStap(3);
+      window.scrollTo({ top: blok.offsetTop - 40, behavior: "smooth" });
+    }
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var naam = $("#kopers-naam");
@@ -851,17 +955,32 @@
       if (!akkoord.checked) { zetFout(akkoord, "Zet een vinkje om akkoord te gaan met de voorwaarden."); ok = false; }
       if (!ok) return;
 
-      verstuurLead("koper-abonnement", { naam: naam.value.trim(), email: email.value.trim(), tarief: KOPER_FEE + " per maand" });
-      bewaarKoper({ naam: naam.value.trim(), email: email.value.trim(), betaald: true });
+      var naamW = naam.value.trim();
+      var emailW = email.value.trim();
 
-      blok.innerHTML =
-        "<div class='bevestiging'>" +
-          "<div class='vink' aria-hidden='true'>✓</div>" +
-          "<h2>Welkom. Je bent nu lid.</h2>" +
-          "<p class='grijs'>Vanaf nu praat je op elk pand rechtstreeks met de eigenaar, doe je biedingen en zie je de volledige verkoperinformatie. Je betaalt " + KOPER_FEE + " per maand en zegt elke maand met één klik op.</p>" +
-          "<p class='klein grijs'>Prototype: er wordt niets afgeschreven en je gegevens worden niet doorverkocht — aan niemand, ooit.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
-        "</div>";
+      /* Naar de betaalstap. Het account wordt PAS aangemaakt in onBetaald. */
+      form.hidden = true;
+      checkout.hidden = false;
+      zetStap(2);
+      mollieCheckout(checkout, {
+        bedrag: KOPER_FEE,
+        periode: "per maand, maandelijks opzegbaar",
+        omschrijving: "Panvia kopersabonnement",
+        knopLabel: "Betaal " + KOPER_FEE,
+        klein: "Vandaag " + KOPER_FEE + ", daarna elke maand — opzegbaar met één klik.",
+        onTerug: function () {
+          checkout.hidden = true;
+          checkout.innerHTML = "";
+          form.hidden = false;
+          zetStap(1);
+          window.scrollTo({ top: blok.offsetTop - 40, behavior: "smooth" });
+        },
+        onBetaald: function () {
+          verstuurLead("koper-abonnement", { naam: naamW, email: emailW, tarief: KOPER_FEE + " per maand" });
+          bewaarKoper({ naam: naamW, email: emailW, betaald: true });
+          toonWelkom();
+        }
+      });
       window.scrollTo({ top: blok.offsetTop - 40, behavior: "smooth" });
     });
     $all("input", form).forEach(wisFoutBijInvoer);
@@ -1737,33 +1856,49 @@
       });
     });
 
-    /* Betalen (gesimuleerd) */
+    /* Betalen — in de normale stand loopt dit via Mollie (gesimuleerd, zie
+       mollieVerwerk); de plaatsing/het verkoperaccount wordt PAS afgerond
+       nadat de betaling is geslaagd. In lanceringsmodus (wachtlijst) betaalt
+       de verkoper nog niets. */
     var betaalKnop = $("#betaal-knop");
     if (betaalKnop) {
       betaalKnop.addEventListener("click", function () {
         var paneel = $("#formulier-paneel");
         var indicator = $("#stap-indicator");
-
-        verstuurLead("verkoper-aanmelding", {
-          naam: gegevens.verkoper ? gegevens.verkoper.naam : "",
-          email: gegevens.verkoper ? gegevens.verkoper.email : "",
-          telefoon: gegevens.verkoper ? gegevens.verkoper.telefoon : "",
-          adres: gegevens.adres,
-          postcode: gegevens.postcode,
-          plaats: gegevens.plaats,
-          land: gegevens.land || "Nederland",
-          type: gegevens.type,
-          pandsoort: gegevens.subtype,
-          oppervlakte: gegevens.oppervlakte,
-          bouwjaar: gegevens.bouwjaar,
-          energielabel: gegevens.energielabel,
-          vraagprijs: gegevens.vraagprijs,
-          kk: gegevens.kk,
-          aantalFotos: gegevens.fotos ? gegevens.fotos.length : 0
-        });
-
-        indicator.hidden = true;
         var lancering = cfg("lanceringsModus", false);
+
+        function rondAf() {
+          verstuurLead("verkoper-aanmelding", {
+            naam: gegevens.verkoper ? gegevens.verkoper.naam : "",
+            email: gegevens.verkoper ? gegevens.verkoper.email : "",
+            telefoon: gegevens.verkoper ? gegevens.verkoper.telefoon : "",
+            adres: gegevens.adres,
+            postcode: gegevens.postcode,
+            plaats: gegevens.plaats,
+            land: gegevens.land || "Nederland",
+            type: gegevens.type,
+            pandsoort: gegevens.subtype,
+            oppervlakte: gegevens.oppervlakte,
+            bouwjaar: gegevens.bouwjaar,
+            energielabel: gegevens.energielabel,
+            vraagprijs: gegevens.vraagprijs,
+            kk: gegevens.kk,
+            aantalFotos: gegevens.fotos ? gegevens.fotos.length : 0
+          });
+
+          /* Verkoperaccount pas 'echt' na betaling: markeer betaald (in de
+             wachtlijst-stand is er nog niet betaald). */
+          try {
+            var vk = gegevens.verkoper || {};
+            vk.betaald = !lancering;
+            localStorage.setItem(VERKOPER_KEY, JSON.stringify(vk));
+          } catch (e) { /* privémodus */ }
+
+          indicator.hidden = true;
+          renderBevestiging();
+        }
+
+        function renderBevestiging() {
         paneel.innerHTML = lancering
           ? "<div class='bevestiging'>" +
               "<div class='vink' aria-hidden='true'>✓</div>" +
@@ -1786,9 +1921,20 @@
               "Wat jij doet: praten met kopers en verkopen. Zo is het verdeeld.</p>" +
               "<p style='margin-top:24px'><a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
             "</div>";
-        var kop = $("h2", paneel);
-        if (kop) { kop.setAttribute("tabindex", "-1"); kop.focus(); }
-        window.scrollTo({ top: 0, behavior: "smooth" });
+          var kop = $("h2", paneel);
+          if (kop) { kop.setAttribute("tabindex", "-1"); kop.focus(); }
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        if (lancering) {
+          /* Wachtlijst: geen betaling, meteen aanmelden. */
+          rondAf();
+        } else {
+          /* Pay-first: verwerk de al gekozen betaalwijze via Mollie, rond
+             daarna pas af. */
+          indicator.hidden = true;
+          mollieVerwerk(paneel, rondAf);
+        }
       });
     }
 

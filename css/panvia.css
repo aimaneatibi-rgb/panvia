@@ -278,10 +278,7 @@ p { margin: 0 0 var(--s-16); }
 .nav-account {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-12);
-  padding-left: var(--s-24);
-  margin-left: var(--s-8);
-  border-left: 1px solid var(--krijt);
+  gap: var(--s-16);
 }
 .nav-account a { font-size: 15px; }
 .nav-account .nav-account-maak,
@@ -929,6 +926,60 @@ legend {
   border-color: var(--zegel);
   color: var(--wit);
 }
+
+/* --------------------------------------------------------------------------
+   Mollie-stijl checkout (gesimuleerd — de "Mollie-ready" naad, zie panvia.js).
+   In productie vervangt een echte Mollie hosted checkout dit paneel; de
+   opmaak hier volgt bewust de sobere, vertrouwde betaalkaart-look.
+   -------------------------------------------------------------------------- */
+.mollie {
+  max-width: 460px;
+  background: var(--wit);
+  border: 1px solid var(--krijt);
+  border-radius: var(--radius-kaart);
+  overflow: hidden;
+}
+.mollie-balk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-16);
+  padding: var(--s-12) var(--s-16);
+  border-bottom: 1px solid var(--krijt);
+  background: var(--lucht);
+  font-size: 13px;
+  color: var(--staal);
+}
+.mollie-balk .mollie-slot { display: inline-flex; align-items: center; gap: var(--s-8); font-weight: 500; }
+.mollie-body { padding: var(--s-24); }
+.mollie-bedrag {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 34px;
+  line-height: 1.1;
+  color: var(--ultramarijn);
+  margin: 0;
+}
+.mollie-omschrijving { color: var(--staal); margin: var(--s-4) 0 var(--s-24); }
+.mollie-methodes { display: flex; flex-direction: column; gap: var(--s-8); margin: 0 0 var(--s-24); }
+.mollie-methodes .radio-optie { width: 100%; }
+.mollie-bank { margin: 0 0 var(--s-24); }
+.mollie-body .btn { width: 100%; }
+.mollie-klein { font-size: 13px; color: var(--staal); margin: var(--s-16) 0 0; text-align: center; }
+
+.mollie-verwerkt { text-align: center; padding: var(--s-48) var(--s-24); }
+.mollie-spinner {
+  width: var(--s-32);
+  height: var(--s-32);
+  margin: 0 auto var(--s-16);
+  border: 3px solid var(--krijt);
+  border-top-color: var(--ultramarijn);
+  border-radius: 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mollie-spinner { animation: mollie-draai .8s linear infinite; }
+}
+@keyframes mollie-draai { to { transform: rotate(360deg); } }
 
 .formulier-paneel {
   background: var(--wit);
@@ -1725,7 +1776,10 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
   .hero { padding-top: var(--s-64); padding-bottom: var(--s-64); }
 }
 
-@media (max-width: 720px) {
+/* Navigatie klapt in op de hamburger zodra de horizontale balk krap wordt.
+   Breekpunt hoger dan de overige mobiel-regels: met de ruimere item-spacing
+   (48px) past de balk pas comfortabel vanaf ~1121px. */
+@media (max-width: 1120px) {
   .nav-toggle { display: inline-flex; }
   .site-nav {
     display: none;
@@ -1747,7 +1801,9 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
     border-top: 1px solid var(--krijt);
     width: 100%;
   }
+}
 
+@media (max-width: 720px) {
   .btn { min-height: 48px; } /* 48px op mobiel */
   .formulier-paneel { padding: var(--s-24); }
   .prijsblok { padding: var(--s-32); }
