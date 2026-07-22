@@ -474,6 +474,98 @@ var PANVIA_PANDEN = [
       "De verhuuradministratie van de afgelopen drie seizoenen ligt ter inzage. " +
       "Koop verloopt naar Oostenrijks recht; de eigenaar deelt zijn notaris- en belastingcontacten ter plaatse.",
     extra: { "Verhuurvergunning": "Aanwezig, gaat mee over", "Skilift": "Op 400 m", "Koopproces": "Oostenrijks recht" }
+  },
+  {
+    id: "v4",
+    type: "vakantie",
+    subtype: "Appartement aan zee",
+    adres: "Avenida del Mar 27, 3B",
+    plaats: "Marbella, Costa del Sol",
+    land: "Spanje",
+    prijs: 345000,
+    oppervlakte: 92,
+    perceel: null,
+    bouwjaar: 2008,
+    energielabel: "D",
+    kamers: 3,
+    status: "te-koop",
+    views: 2740,
+    kadastraal: "Registro de la Propiedad de Marbella, finca 12.905",
+    omschrijving:
+      "Appartement op de derde verdieping met lift, zeezicht en een terras van 18 m² op het zuiden, " +
+      "op tien minuten lopen van het strand van Marbella. Gemeenschappelijk zwembad en tuin. " +
+      "De Nederlandse eigenaren verkopen zelf en leveren het volledige dossier: nota simple, " +
+      "IBI-afrekeningen en de kosten van de comunidad. Koop verloopt naar Spaans recht via een notario.",
+    extra: { "Zeezicht": "Ja", "Zwembad": "Gemeenschappelijk", "Comunidad": "€ 1.320 per jaar", "Koopproces": "Spaans recht (notario + gestor)" }
+  },
+  {
+    id: "v5",
+    type: "vakantie",
+    subtype: "Finca",
+    adres: "Caminho da Fonte 8",
+    plaats: "Loulé, Algarve",
+    land: "Portugal",
+    prijs: 399000,
+    oppervlakte: 140,
+    perceel: 3200,
+    bouwjaar: 1994,
+    energielabel: "E",
+    kamers: 5,
+    status: "te-koop",
+    views: 1863,
+    kadastraal: "Conservatória do Registo Predial de Loulé, 4471",
+    omschrijving:
+      "Finca met 3.200 m² grond, olijf- en sinaasappelbomen en een eigen bron, tien minuten van Loulé. " +
+      "Honderdveertig m² woonoppervlak, buitenkeuken en een plunge pool. Rustig, aan het eind van een landweg. " +
+      "De eigenaar verkoopt zelf en is eerlijk over het onderhoud dat een oud landhuis vraagt. " +
+      "Koop verloopt naar Portugees recht; reken op een advogado voor de afhandeling.",
+    extra: { "Grond": "3.200 m², eigen bron", "Zwembad": "Plunge pool", "Bijzonderheid": "Olijf- en sinaasappelbomen", "Koopproces": "Portugees recht" }
+  },
+  {
+    id: "v6",
+    type: "vakantie",
+    subtype: "Chalet",
+    adres: "Chemin des Praz 15",
+    plaats: "Chamonix",
+    land: "Frankrijk",
+    prijs: 685000,
+    oppervlakte: 108,
+    perceel: 320,
+    bouwjaar: 2016,
+    energielabel: "C",
+    kamers: 4,
+    status: "te-koop",
+    views: 2291,
+    kadastraal: "Service de la publicité foncière de Bonneville, AK-118",
+    omschrijving:
+      "Chalet uit 2016 met uitzicht op de Mont Blanc, op loopafstand van de skibus en het centrum van Chamonix. " +
+      "Honderdacht m², vier kamers, ski-berging en een zuidterras. Verhuur is toegestaan en loopt goed in het seizoen; " +
+      "de cijfers liggen ter inzage. De eigenaar verkoopt rechtstreeks en deelt zijn notaire ter plaatse. " +
+      "Koop verloopt naar Frans recht.",
+    extra: { "Uitzicht": "Mont Blanc", "Verhuur": "Toegestaan, cijfers ter inzage", "Ski": "Skibus op loopafstand", "Koopproces": "Frans recht (notaire)" }
+  },
+  {
+    id: "v7",
+    type: "vakantie",
+    subtype: "Landhuis",
+    adres: "Contrada Lamie 44",
+    plaats: "Ostuni, Puglia",
+    land: "Italië",
+    prijs: 275000,
+    oppervlakte: 120,
+    perceel: 1800,
+    bouwjaar: 1978,
+    energielabel: "F",
+    kamers: 4,
+    status: "te-koop",
+    views: 1497,
+    kadastraal: "Agenzia delle Entrate, Ostuni, foglio 12 part. 340",
+    omschrijving:
+      "Traditioneel landhuis met trullo-koepel op 1.800 m² grond met oude olijfbomen, tussen Ostuni en de kust. " +
+      "Honderdtwintig m², gewelfde plafonds, een hof en ruimte voor een zwembad (vergunning aanwezig). " +
+      "De eigenaar verkoopt zelf en vertelt je eerlijk wat er nog moet gebeuren. " +
+      "Koop verloopt naar Italiaans recht via een notaio; reken op een geometra voor de papieren.",
+    extra: { "Grond": "1.800 m² met olijfbomen", "Bijzonderheid": "Trullo-koepel, gewelfde plafonds", "Zwembad": "Vergunning aanwezig", "Koopproces": "Italiaans recht (notaio)" }
   }
 ];
 

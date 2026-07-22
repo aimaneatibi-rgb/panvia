@@ -420,11 +420,12 @@
 
   /* ------------------------------------------------------------------------
      Kopersaccount & gesprekken (gesimuleerd, localStorage)
-     Koper betaalt € 8,95 eenmalig om te praten en te bieden — de drempel
-     die spam weert. Panvia leest niet mee; de opslag is hier lokaal.
+     Koper betaalt € 12,95 per maand om te praten, te bieden en de volledige
+     verkoperinformatie te zien — de drempel die spam weert. Panvia leest
+     niet mee; de opslag is hier lokaal.
      ------------------------------------------------------------------------ */
   var KOPER_KEY = "panvia-koper";
-  var KOPER_FEE = "€ 8,95";
+  var KOPER_FEE = "€ 12,95";
 
   function koperAccount() {
     try { return JSON.parse(localStorage.getItem(KOPER_KEY)); } catch (e) { return null; }
@@ -456,10 +457,45 @@
     return max;
   }
 
+  /* Verkopergegevens zijn beschermd: ze bestaan niet in de pagina tot de
+     eigenaar ze zelf in de chat deelt. Hier deterministisch verzonnen per
+     pand — in het echte platform komen ze uit het account van de eigenaar. */
+  function verkoperVan(pand) {
+    var vn = ["Mark", "Sanne", "Peter", "Anne", "Jeroen", "Fatima", "Youssef", "Lisa", "Dirk", "Ingrid", "Ruben", "Nadia"];
+    var an = ["de Vries", "Jansen", "Bakker", "El Amrani", "Visser", "Smit", "De Boer", "Meijer", "Van Dijk", "Koster"];
+    var rng = maakRng(pand.id + "-verkoper");
+    var voornaam = vn[Math.floor(rng() * vn.length)];
+    var achternaam = an[Math.floor(rng() * an.length)];
+    var nummer = "06 " + String(10000000 + Math.floor(rng() * 89999999));
+    var email = (voornaam + "." + achternaam.replace(/\s/g, "").toLowerCase() + "@voorbeeld.nl")
+      .toLowerCase().replace(/[^a-z0-9.@]/g, "");
+    return { naam: voornaam + " " + achternaam, telefoon: nummer, email: email };
+  }
+
   /* Eén chatbubbel. ikBen = "koper" (pandpagina) of "eigenaar" (Mijn Panvia). */
   function chatBerichtHTML(b, ikBen, koperNaam) {
     var eigen = b.van === ikBen;
     var wie = eigen ? "jij" : (b.van === "koper" ? (koperNaam || "koper").split(" ")[0] : "eigenaar");
+
+    /* Beveiligde contactkaart: alleen zichtbaar in de chat, met watermerk
+       dat de ontvanger benoemt (afschrikking tegen doorsturen/screenshotten). */
+    if (b.type === "contactkaart") {
+      var c = b.contact || {};
+      var merk = (koperNaam || "deze koper");
+      return "<div class='chat-bericht " + (eigen ? "chat-eigen" : "chat-ander") + " contactkaart' " +
+        "oncontextmenu='return false' ondragstart='return false'>" +
+        "<span class='chat-bod-label'>Contactgegevens · vertrouwelijk</span>" +
+        "<div class='contactkaart-data'>" +
+          "<p class='ck-naam'>" + escapeHTML(c.naam || "") + "</p>" +
+          "<p class='ck-regel tnum'>" + escapeHTML(c.telefoon || "") + "</p>" +
+          "<p class='ck-regel'>" + escapeHTML(c.email || "") + "</p>" +
+          "<span class='contactkaart-merk' aria-hidden='true'>" + escapeHTML(merk) + " · alleen voor jou</span>" +
+        "</div>" +
+        "<span class='chat-bod-note'>De eigenaar deelt dit vertrouwelijk met jou. Niet doorsturen of screenshotten — dit is aan jouw account herleidbaar.</span>" +
+        "<span class='chat-tijd tnum'>" + escapeHTML(wie) + " · " + b.tijd + "</span>" +
+        "</div>";
+    }
+
     var inhoud;
     if (b.type === "bod") {
       inhoud =
@@ -474,6 +510,91 @@
       inhoud +
       "<span class='chat-tijd tnum'>" + escapeHTML(wie) + " · " + b.tijd + "</span>" +
       "</div>";
+  }
+
+  /* Schermbescherming: vervaag beveiligde kaarten zodra het venster de focus
+     verliest of de tab verborgen wordt — een afschrikking tegen screenshots.
+     Echte preventie kan niet op het web; dit maakt vastleggen alleen lastiger. */
+  function initSchermbescherming() {
+    function zet(verberg) {
+      document.body.classList.toggle("scherm-verborgen", verberg);
+      $all(".contactkaart-data").forEach(function (el) { el.classList.toggle("is-verborgen", verberg); });
+    }
+    document.addEventListener("visibilitychange", function () { zet(document.hidden); });
+    window.addEventListener("blur", function () { zet(true); });
+    window.addEventListener("focus", function () { zet(false); });
+    /* Kopiëren van beveiligde kaarten blokkeren */
+    document.addEventListener("copy", function (e) {
+      var sel = window.getSelection();
+      if (sel && sel.anchorNode) {
+        var el = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+        if (el && el.closest && el.closest(".contactkaart")) {
+          e.preventDefault();
+        }
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+     Account-blok rechtsboven — inloggen / account maken, of ingelogd
+     ------------------------------------------------------------------------ */
+  function initAccountNav() {
+    var slot = $("#nav-account");
+    if (!slot) return;
+    var k = koperAccount();
+    if (k && k.betaald) {
+      slot.innerHTML =
+        "<a class='nav-account-naam' href='inloggen.html' title='Mijn account'>" + escapeHTML(k.naam.split(" ")[0]) + "</a>" +
+        "<button type='button' class='nav-uitlog' id='nav-uitlog'>Uitloggen</button>";
+      var uit = $("#nav-uitlog");
+      if (uit) uit.addEventListener("click", function () {
+        try { localStorage.removeItem("panvia-koper"); } catch (e) {}
+        window.location.reload();
+      });
+    } else {
+      slot.innerHTML =
+        "<a href='inloggen.html'>Inloggen</a>" +
+        "<a class='nav-account-maak' href='inloggen.html#maken'>Account maken</a>";
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Pagina: inloggen — mock-login op basis van het lokale kopersaccount
+     ------------------------------------------------------------------------ */
+  function initInloggen() {
+    var form = $("#login-form");
+    if (!form) return;
+    var k = koperAccount();
+    if (k && k.betaald) {
+      $("#login-blok").innerHTML =
+        "<div class='bevestiging'>" +
+          "<div class='vink' aria-hidden='true'>✓</div>" +
+          "<h2>Je bent ingelogd</h2>" +
+          "<p class='grijs'>Welkom terug, " + escapeHTML(k.naam.split(" ")[0]) + ". Je kopersabonnement is actief — je kunt op elk pand praten, bieden en gedeelde contactgegevens ontvangen.</p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Naar het aanbod</a> <button type='button' class='btn btn-tertiair' id='login-uitlog'>Uitloggen</button></p>" +
+        "</div>";
+      var uit = $("#login-uitlog");
+      if (uit) uit.addEventListener("click", function () {
+        try { localStorage.removeItem("panvia-koper"); } catch (e) {}
+        window.location.reload();
+      });
+      return;
+    }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = $("#login-email");
+      if (!geldigEmail(email.value)) { zetFout(email, "Vul een e-mailadres in, bijvoorbeeld naam@voorbeeld.nl"); return; }
+      /* Prototype: we hebben geen wachtwoorden. Kennen we dit e-mailadres als
+         kopersaccount, dan 'loggen we in'; anders wijzen we naar aanmelden. */
+      var bestaand = koperAccount();
+      if (bestaand && bestaand.email && bestaand.email.toLowerCase() === email.value.trim().toLowerCase()) {
+        bewaarKoper({ naam: bestaand.naam, email: bestaand.email, betaald: true });
+        window.location.reload();
+      } else {
+        zetFout(email, "We kennen dit e-mailadres nog niet. Maak hieronder een account aan.");
+      }
+    });
+    $all("input", form).forEach(wisFoutBijInvoer);
   }
 
   /* ------------------------------------------------------------------------
@@ -513,9 +634,9 @@
         kijkers += p.views || 0;
         if (plaatsen.indexOf(p.plaats) === -1) plaatsen.push(p.plaats);
       });
-      statPanden.textContent = fmtDuizend(PANVIA_PANDEN.length);
-      $("#stat-kijkers").textContent = fmtDuizend(kijkers);
-      $("#stat-plaatsen").textContent = fmtDuizend(plaatsen.length);
+      zetTelDoel(statPanden, PANVIA_PANDEN.length);
+      zetTelDoel($("#stat-kijkers"), kijkers);
+      zetTelDoel($("#stat-plaatsen"), plaatsen.length);
     }
 
     /* Rekenmachine — jouw som, live. Courtage vul je zelf in (komma of punt). */
@@ -637,6 +758,113 @@
     var q = new URLSearchParams(window.location.search);
     if (q.get("type")) fType.value = q.get("type");
     pas();
+  }
+
+  /* ------------------------------------------------------------------------
+     Pagina: buitenland — al het vastgoed buiten Nederland, per land
+     ------------------------------------------------------------------------ */
+  function initBuitenland() {
+    var grid = $("#buitenland-grid");
+    var teller = $("#resultaat-teller");
+    var leeg = $("#leeg-melding");
+    var fLand = $("#filter-land");
+    var fType = $("#filter-type");
+    var fPrijs = $("#filter-prijs");
+    var wis = $("#wis-filters");
+    if (!grid) return;
+
+    var buitenland = PANVIA_PANDEN.filter(function (p) { return p.land && p.land !== "Nederland"; });
+
+    /* Landen-dropdown vullen uit het buitenlandse aanbod */
+    var landen = [];
+    buitenland.forEach(function (p) { if (landen.indexOf(p.land) === -1) landen.push(p.land); });
+    landen.sort();
+    landen.forEach(function (l) {
+      var opt = document.createElement("option");
+      opt.value = l; opt.textContent = l;
+      fLand.appendChild(opt);
+    });
+
+    function pas() {
+      var resultaat = buitenland.filter(function (p) {
+        if (fLand.value && p.land !== fLand.value) return false;
+        if (fType.value && p.type !== fType.value) return false;
+        if (fPrijs.value && p.prijs > Number(fPrijs.value)) return false;
+        return true;
+      });
+      renderKaarten(grid, resultaat);
+      teller.innerHTML = "<strong class='tnum'>" + resultaat.length + "</strong> " +
+        (resultaat.length === 1 ? "pand in het buitenland" : "panden in het buitenland") +
+        " · rechtstreeks van eigenaar";
+      leeg.hidden = resultaat.length !== 0;
+      grid.hidden = resultaat.length === 0;
+    }
+
+    [fLand, fType, fPrijs].forEach(function (el) {
+      if (el) el.addEventListener("change", pas);
+    });
+    wis.addEventListener("click", function () {
+      fLand.value = ""; fType.value = ""; fPrijs.value = "";
+      pas();
+    });
+
+    /* Snelkoppeling per land via URL, bv. buitenland.html?land=Spanje */
+    var q = new URLSearchParams(window.location.search);
+    if (q.get("land") && landen.indexOf(q.get("land")) !== -1) fLand.value = q.get("land");
+    pas();
+  }
+
+  /* ------------------------------------------------------------------------
+     Pagina: kopers — het kopersabonnement afsluiten (€ 12,95 p/m)
+     ------------------------------------------------------------------------ */
+  function initKopers() {
+    var blok = $("#kopers-aanmeld-blok");
+    if (!blok) return;
+
+    var prijsEls = $all(".js-koper-fee");
+    prijsEls.forEach(function (el) { el.textContent = KOPER_FEE; });
+
+    /* Al lid? Toon dat, in plaats van het formulier. */
+    var bestaand = koperAccount();
+    if (bestaand && bestaand.betaald) {
+      blok.innerHTML =
+        "<div class='bevestiging'>" +
+          "<div class='vink' aria-hidden='true'>✓</div>" +
+          "<h2>Je bent al lid</h2>" +
+          "<p class='grijs'>Je kopersabonnement staat op naam van <strong>" + escapeHTML(bestaand.naam) + "</strong> (" +
+          escapeHTML(bestaand.email) + "). Je kunt op elk pand rechtstreeks met de eigenaar praten, bieden en de volledige verkoperinformatie zien.</p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+        "</div>";
+      return;
+    }
+
+    var form = $("#kopers-form");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var naam = $("#kopers-naam");
+      var email = $("#kopers-email");
+      var akkoord = $("#kopers-akkoord");
+      var ok = true;
+      if (!naam.value.trim()) { zetFout(naam, "Vul je naam in, dan weten eigenaren wie er schrijft."); ok = false; }
+      if (!geldigEmail(email.value)) { zetFout(email, "Vul een e-mailadres in, bijvoorbeeld naam@voorbeeld.nl"); ok = false; }
+      if (!akkoord.checked) { zetFout(akkoord, "Zet een vinkje om akkoord te gaan met de voorwaarden."); ok = false; }
+      if (!ok) return;
+
+      verstuurLead("koper-abonnement", { naam: naam.value.trim(), email: email.value.trim(), tarief: KOPER_FEE + " per maand" });
+      bewaarKoper({ naam: naam.value.trim(), email: email.value.trim(), betaald: true });
+
+      blok.innerHTML =
+        "<div class='bevestiging'>" +
+          "<div class='vink' aria-hidden='true'>✓</div>" +
+          "<h2>Welkom. Je bent nu lid.</h2>" +
+          "<p class='grijs'>Vanaf nu praat je op elk pand rechtstreeks met de eigenaar, doe je biedingen en zie je de volledige verkoperinformatie. Je betaalt " + KOPER_FEE + " per maand en zegt elke maand met één klik op.</p>" +
+          "<p class='klein grijs'>Prototype: er wordt niets afgeschreven en je gegevens worden niet doorverkocht — aan niemand, ooit.</p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+        "</div>";
+      window.scrollTo({ top: blok.offsetTop - 40, behavior: "smooth" });
+    });
+    $all("input", form).forEach(wisFoutBijInvoer);
   }
 
   /* ------------------------------------------------------------------------
@@ -766,30 +994,48 @@
 
     /* --------------------------------------------------------------------
        Chat & bieden met de eigenaar (gesimuleerd). Rechtstreeks, Panvia
-       zit er niet tussen. Vereist een kopersaccount van € 8,95 (eenmalig,
-       de drempel die spam weert). Gesprek wordt per pand lokaal bewaard.
+       zit er niet tussen. Vereist een kopersabonnement van € 12,95 per maand
+       (de drempel die spam weert). Gesprek wordt per pand lokaal bewaard.
        -------------------------------------------------------------------- */
     var chatKey = "panvia-chat-" + pand.id;
     var chatBlok = $("#contact-blok-inhoud");
-    var CHAT_SNELVRAGEN = ["Kan ik komen kijken?", "Waarom verkoop je?", "Zijn er rapporten in te zien?"];
+    var CHAT_SNELVRAGEN = ["Kan ik komen kijken?", "Waarom verkoop je?", "Zijn er rapporten in te zien?", "Mag ik je contactgegevens?"];
 
     function eigenaarAntwoord(chat) {
       var laatste = laatsteBericht(chat);
-      if (laatste && laatste.type === "bod") {
-        return "Dank voor je bod van " + fmtPrijs(laatste.bedrag) + ", " + chat.naam.split(" ")[0] +
-          ". Ik laat het even bezinken en kom er binnen twee dagen op terug.";
+      /* Verzoek om contactgegevens — alleen delen bij aangetoonde interesse */
+      var vraagtContact = laatste && laatste.type !== "bod" && laatste.tekst &&
+        /contactgegeven|telefoon|nummer|bellen|bereiken|appen|mailadres/i.test(laatste.tekst);
+      if (vraagtContact) {
+        var alGedeeld = chat.berichten.some(function (b) { return b.type === "contactkaart"; });
+        if (alGedeeld) {
+          return [{ tekst: "Mijn gegevens heb ik hierboven al met je gedeeld — bel of app gerust." }];
+        }
+        var koperTekst = chat.berichten.filter(function (b) { return b.van === "koper" && b.type !== "bod"; }).length;
+        var interesse = hoogsteBod(chat) > 0 || koperTekst >= 3;
+        if (interesse) {
+          return [
+            { tekst: "Je meent het duidelijk, " + chat.naam.split(" ")[0] + ". Hier zijn mijn gegevens — bel of app gerust. Ik hou ze graag tussen ons." },
+            { type: "contactkaart", contact: verkoperVan(pand) }
+          ];
+        }
+        return [{ tekst: "Mijn nummer deel ik graag zodra ik merk dat het serieus is — kom eerst even kijken, of doe een bod. Dan hoor je meteen van me." }];
       }
-      var nEigenaar = chat.berichten.filter(function (b) { return b.van === "eigenaar"; }).length;
+      if (laatste && laatste.type === "bod") {
+        return [{ tekst: "Dank voor je bod van " + fmtPrijs(laatste.bedrag) + ", " + chat.naam.split(" ")[0] +
+          ". Ik laat het even bezinken en kom er binnen twee dagen op terug." }];
+      }
+      var nEigenaar = chat.berichten.filter(function (b) { return b.van === "eigenaar" && b.type !== "contactkaart"; }).length;
       if (nEigenaar === 0) {
-        return "Dag " + chat.naam.split(" ")[0] + ", dank voor je bericht — leuk dat je interesse hebt in " +
-          pand.adres + ". Vraag gerust door, of stel een moment voor om te komen kijken.";
+        return [{ tekst: "Dag " + chat.naam.split(" ")[0] + ", dank voor je bericht — leuk dat je interesse hebt in " +
+          pand.adres + ". Vraag gerust door, of stel een moment voor om te komen kijken." }];
       }
       var vervolg = [
         "Goede vraag. Ik ken dit pand door en door, dus ik vertel je het eerlijke verhaal — ook wat er minder aan is. Bij een bezichtiging liggen alle stukken ter inzage.",
         "Deze week kan ik doordeweeks na 17:00, of zaterdagochtend. Wat past jou? Neem gerust iemand mee.",
         "Prima, dan houden we dat aan. Tot dan — en als er tussendoor iets is, stuur je maar een bericht."
       ];
-      return vervolg[Math.min(nEigenaar - 1, vervolg.length - 1)];
+      return [{ tekst: vervolg[Math.min(nEigenaar - 1, vervolg.length - 1)] }];
     }
 
     function simuleerAntwoord(chat) {
@@ -800,7 +1046,10 @@
       thread.appendChild(typt);
       thread.scrollTop = thread.scrollHeight;
       setTimeout(function () {
-        chat.berichten.push({ van: "eigenaar", tekst: eigenaarAntwoord(chat), tijd: tijdNu() });
+        eigenaarAntwoord(chat).forEach(function (m) {
+          m.van = "eigenaar"; m.tijd = tijdNu();
+          chat.berichten.push(m);
+        });
         bewaarChatIn(chatKey, chat);
         renderChat(chat);
         var veld = $("#chat-tekst");
@@ -878,12 +1127,13 @@
       wisFoutBijInvoer(bodBedrag);
     }
 
-    /* Stap 1 — kopersaccount: € 8,95 eenmalig, daarna praat en bied je overal */
+    /* Stap 1 — kopersabonnement: € 12,95 per maand, daarna praat, bied en
+       zie je de volledige verkoperinformatie overal */
     function renderAccount() {
       chatBlok.innerHTML =
         "<div class='account-box'>" +
-          "<span class='label'>Kopersaccount</span>" +
-          "<p class='klein grijs'>Praten met eigenaren en bieden doe je met een kopersaccount: <strong class='tnum'>" + KOPER_FEE + "</strong> per maand, geldig voor alle panden en maandelijks opzegbaar. Zo weet elke eigenaar dat er een serieuze koper schrijft — en krijg jij antwoord in plaats van stilte.</p>" +
+          "<span class='label'>Kopersabonnement</span>" +
+          "<p class='klein grijs'>Praten met eigenaren, bieden én de volledige verkoperinformatie zien doe je met een kopersabonnement: <strong class='tnum'>" + KOPER_FEE + "</strong> per maand, geldig voor alle panden en maandelijks opzegbaar. Zo weet elke eigenaar dat er een serieuze koper schrijft — en krijg jij antwoord in plaats van stilte. <a href='kopers.html'>Meer over het abonnement</a>.</p>" +
           "<div class='veld'>" +
             "<label for='account-naam'>Je naam</label>" +
             "<input type='text' id='account-naam' autocomplete='name'>" +
@@ -1029,7 +1279,7 @@
       if (!ok) return;
 
       var type = ($("input[name='pa-type']:checked") || {}).value || "woning";
-      var pakket = n >= 76 ? "Project L (€ 9.950)" : (n >= 26 ? "Project M (€ 5.950)" : (n >= 10 ? "Project S (€ 2.950)" : "Losse plaatsing (< 10 eenheden)"));
+      var pakket = n >= 76 ? "Project L (€ 14.950)" : (n >= 26 ? "Project M (€ 9.950)" : (n >= 10 ? "Project S (€ 5.950)" : "Losse plaatsing (< 10 eenheden)"));
 
       verstuurLead("project-aanmelding", {
         organisatie: org.value.trim(),
@@ -1220,6 +1470,7 @@
       var paneel = $("#inbox-gesprek");
       lijst.hidden = true;
       paneel.hidden = false;
+      var alGedeeld = chat.berichten.some(function (b) { return b.type === "contactkaart"; });
       paneel.innerHTML =
         "<button type='button' class='terug-link' id='inbox-terug'>← Alle gesprekken</button>" +
         "<div class='chat'>" +
@@ -1227,12 +1478,17 @@
           "<div class='chat-thread' id='eig-thread'>" +
             chat.berichten.map(function (b) { return chatBerichtHTML(b, "eigenaar", chat.naam); }).join("") +
           "</div>" +
+          "<div class='chat-chips'>" +
+            (alGedeeld
+              ? "<span class='klein grijs'>Je hebt je contactgegevens met " + escapeHTML(chat.naam.split(" ")[0]) + " gedeeld.</span>"
+              : "<button type='button' class='chip chip-deel' id='eig-deel'>Deel mijn contactgegevens</button>") +
+          "</div>" +
           "<form class='chat-invoer' id='eig-invoer'>" +
             "<label class='visueel-verborgen' for='eig-tekst'>Je antwoord</label>" +
             "<input type='text' id='eig-tekst' autocomplete='off'>" +
             "<button type='submit' class='btn btn-primair'>Stuur</button>" +
           "</form>" +
-          "<p class='klein grijs'>" + escapeHTML(chat.naam.split(" ")[0]) + " krijgt een seintje per mail — de inhoud blijft tussen jullie. Prototype: er wordt niets verstuurd.</p>" +
+          "<p class='klein grijs'>Deel je contactgegevens pas als je merkt dat het serieus is — ze zijn alleen in dit gesprek zichtbaar en van een watermerk voorzien. " + escapeHTML(chat.naam.split(" ")[0]) + " krijgt een seintje per mail. Prototype: er wordt niets verstuurd.</p>" +
         "</div>";
       var thread = $("#eig-thread");
       thread.scrollTop = thread.scrollHeight;
@@ -1245,6 +1501,14 @@
         bewaarChatIn(key, chat);
         openGesprek(key);
       });
+      var deelKnop = $("#eig-deel");
+      if (deelKnop) {
+        deelKnop.addEventListener("click", function () {
+          chat.berichten.push({ van: "eigenaar", type: "contactkaart", contact: verkoperVan(pand), tijd: tijdNu() });
+          bewaarChatIn(key, chat);
+          openGesprek(key);
+        });
+      }
     }
 
     renderStats();
@@ -1506,7 +1770,8 @@
               "<h2>Aangemeld. We nemen contact met je op.</h2>" +
               "<p class='grijs'><strong>Je betaalt nu niets.</strong> " + (gegevens.adres || "Je pand") + " staat genoteerd " +
               "voor de lancering. We controleren je gegevens, nemen binnen twee werkdagen contact op via " +
-              (gegevens.verkoper ? gegevens.verkoper.email : "je e-mailadres") + ", en zetten je pand online zodra het platform opengaat.</p>" +
+              (gegevens.verkoper ? gegevens.verkoper.email : "je e-mailadres") + ", en zetten je pand online " +
+              (cfg("lanceringsDatumTekst", "") ? "zodra Panvia opengaat op " + cfg("lanceringsDatumTekst", "") : "zodra het platform opengaat") + ".</p>" +
               "<p class='grijs'>Als eerste aanmelder plaats je je pand voor " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden — " +
               "en pas nadat je akkoord hebt gegeven. Geen courtage, geen succesfee.</p>" +
               "<p style='margin-top:24px'><a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
@@ -1534,6 +1799,117 @@
   }
 
   /* ------------------------------------------------------------------------
+     Beweging — hulpstukken. Alles hieronder respecteert prefers-reduced-
+     motion: bij "reduce" wordt de eindtoestand meteen gezet, zonder animatie.
+     Brandbook §11: functioneel en kort, geen decoratie om de decoratie.
+     ------------------------------------------------------------------------ */
+  function wilBeweging() {
+    return !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  /* Markeer een cijfer voor de tel-animatie. De eindwaarde staat meteen als
+     tekst (fallback zonder JS/observer); de animatie telt er straks naartoe. */
+  function zetTelDoel(el, waarde) {
+    if (!el) return;
+    el.setAttribute("data-tel", String(waarde));
+    el.textContent = fmtDuizend(waarde);
+  }
+
+  /* Tel-animatie — het getal is de held van dit merk, dus laten we het
+     opbouwen. Van 0 naar de eindwaarde in ~1s met een rustige ease-out,
+     één keer, zodra het cijfer in beeld komt. */
+  function initTelAnimatie() {
+    var doelen = $all("[data-tel]");
+    if (!doelen.length) return;
+    if (!wilBeweging() || !("IntersectionObserver" in window) || !window.requestAnimationFrame) {
+      return; /* eindwaarde staat al als tekst */
+    }
+    var animeer = function (el) {
+      var eind = parseInt(el.getAttribute("data-tel"), 10) || 0;
+      if (eind <= 0) return;
+      var duur = 1000, start = null;
+      el.textContent = "0";
+      var stap = function (t) {
+        if (start === null) start = t;
+        var p = Math.min((t - start) / duur, 1);
+        var eased = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+        el.textContent = fmtDuizend(Math.round(eased * eind));
+        if (p < 1) window.requestAnimationFrame(stap);
+        else el.textContent = fmtDuizend(eind);
+      };
+      window.requestAnimationFrame(stap);
+    };
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { animeer(e.target); obs.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -20px 0px" });
+    doelen.forEach(function (el) { obs.observe(el); });
+  }
+
+  /* Hero-intro — de bovenste elementen komen bij het laden rustig omhoog,
+     gestaffeld. Gebeurt via CSS zodra <html> de klasse 'js-intro' krijgt;
+     zonder JS of bij 'reduce' staat alles gewoon meteen goed. */
+  function initHeroIntro() {
+    if (!wilBeweging()) return;
+    if (document.body.getAttribute("data-page") !== "home") return;
+    document.documentElement.classList.add("js-intro");
+  }
+
+  /* Header krijgt een haarlijn en verdicht zodra je van de hero afscrolt —
+     een stille statusverandering, geen show. */
+  function initHeaderScroll() {
+    var header = $(".site-header");
+    if (!header) return;
+    var drempel = 24, staat = false;
+    var check = function () {
+      var nu = (window.pageYOffset || document.documentElement.scrollTop) > drempel;
+      if (nu !== staat) { staat = nu; header.classList.toggle("gescrolld", nu); }
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+  }
+
+  /* Lanceringsdatum — één bron in config.js. Vult de hero-countdown en levert
+     de datumtekst voor de demo-balk. Zonder datum: alles blijft leeg. */
+  function parseLanceringsDatum() {
+    var iso = cfg("lanceringsDatum", "");
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return null;
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 0, 0, 0, 0);
+  }
+
+  function initCountdown() {
+    var houder = $("#lancering-countdown");
+    if (!houder) return;
+    var doel = parseLanceringsDatum();
+    if (!doel) { houder.hidden = true; return; }
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    var blok = function (getal, label) {
+      return "<span class='cd-blok'><span class='cd-getal tnum'>" + getal +
+        "</span><span class='cd-label'>" + label + "</span></span>";
+    };
+    var tekst = cfg("lanceringsDatumTekst", "");
+    var tick = function () {
+      var diff = doel.getTime() - Date.now();
+      if (diff <= 0) {
+        houder.innerHTML = "<span class='cd-live'>Panvia is live" +
+          (tekst ? " sinds " + tekst : "") + "</span>";
+        if (timer) { window.clearInterval(timer); timer = null; }
+        return;
+      }
+      var d = Math.floor(diff / 86400000);
+      var u = Math.floor((diff % 86400000) / 3600000);
+      var min = Math.floor((diff % 3600000) / 60000);
+      var sec = Math.floor((diff % 60000) / 1000);
+      houder.innerHTML = blok(d, d === 1 ? "dag" : "dagen") +
+        blok(pad(u), "uur") + blok(pad(min), "min") + blok(pad(sec), "sec");
+    };
+    var timer = window.setInterval(tick, 1000);
+    tick();
+  }
+
+  /* ------------------------------------------------------------------------
      Reveal — één rustig systeem: elementen schuiven 14px omhoog bij het
      binnenkomen van het beeld. Respecteert prefers-reduced-motion (CSS).
      ------------------------------------------------------------------------ */
@@ -1552,6 +1928,12 @@
     }, { rootMargin: "0px 0px -40px 0px" });
     doelen.forEach(function (el) {
       el.classList.add("reveal");
+      /* Stagger: kaarten die samen in beeld komen, cascaderen zacht na elkaar.
+         De index binnen de eigen groep buurelementen bepaalt de vertraging,
+         gemaximeerd zodat een lange lijst nooit traag aanvoelt. */
+      var groep = el.parentNode ? $all(".reveal, .pandkaart, .reken-kaart, .stap-kaart, .stat, .regel", el.parentNode) : [];
+      var i = groep.indexOf(el);
+      if (i > 0) el.style.transitionDelay = Math.min(i, 5) * 60 + "ms";
       obs.observe(el);
     });
     /* Vangnet: vuurt de observer om wat voor reden dan ook niet, dan wordt
@@ -1573,7 +1955,9 @@
     if (["aanbod", "zakelijk", "pand", "home"].indexOf(pagina) === -1) return;
     var balk = document.createElement("div");
     balk.className = "demo-balk";
-    balk.innerHTML = "<div class='container'><strong>Voorbeeldaanbod.</strong> Panvia opent binnenkort; " +
+    var datumTekst = cfg("lanceringsDatumTekst", "");
+    var opent = datumTekst ? "Panvia opent " + datumTekst : "Panvia opent binnenkort";
+    balk.innerHTML = "<div class='container'><strong>Voorbeeldaanbod.</strong> " + opent + "; " +
       "de panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
       "<a href='plaatsen.html'>Meld je eigen pand aan</a> — dat is wel echt.</div>";
     var header = $(".site-header");
@@ -1607,10 +1991,17 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    initHeroIntro();
+    initHeaderScroll();
     initNav();
+    initAccountNav();
+    initSchermbescherming();
     var pagina = document.body.getAttribute("data-page");
+    if (pagina === "inloggen") initInloggen();
     if (pagina === "home") initHome();
     if (pagina === "aanbod") initAanbod();
+    if (pagina === "buitenland") initBuitenland();
+    if (pagina === "kopers") initKopers();
     if (pagina === "zakelijk") initZakelijk();
     if (pagina === "pand") initPand();
     if (pagina === "project") initProject();
@@ -1618,6 +2009,8 @@
     if (pagina === "plaatsen") { initPlaatsen(); initLancering(); }
     if (pagina === "eigenaar") initEigenaar();
     initDemoMelding();
+    initCountdown();
+    initTelAnimatie();
     initReveal();
   });
 })();

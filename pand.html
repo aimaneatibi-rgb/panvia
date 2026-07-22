@@ -39,13 +39,12 @@
       <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <nav id="site-nav" class="site-nav" aria-label="Hoofdnavigatie">
         <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="aanbod.html">Aanbod</a></li>
+          <li><a href="aanbod.html" aria-current="page">Aanbod</a></li>
+          <li><a href="buitenland.html">Buitenland</a></li>
           <li><a href="zakelijk.html">Zakelijk</a></li>
-          <li><a href="plaatsen.html">Plaats je pand</a></li>
           <li><a href="projecten.html">Projecten</a></li>
-          <li><a href="eigenaar.html">Mijn Panvia</a></li>
-          <li><a href="over.html">Over ons</a></li>
+          <li><a class="nav-cta" href="plaatsen.html">Plaats je pand</a></li>
+          <li class="nav-account" id="nav-account"></li>
         </ul>
       </nav>
     </div>
@@ -101,7 +100,7 @@
           <div class="eigenaar-blok">
             <span class="label">Rechtstreeks contact</span>
             <h2>Chat met de eigenaar — niet met een makelaar</h2>
-            <p class="grijs klein">Je gesprek is rechtstreeks met de eigenaar van dit pand: vragen stellen, een bezichtiging plannen of een bod doen. Panvia leest niet mee en verkoopt niets door — we mailen je alleen een seintje als er een antwoord is. Zoeken is gratis; praten en bieden doe je met een kopersaccount van <span class="tnum">€ 8,95</span> per maand, maandelijks opzegbaar.</p>
+            <p class="grijs klein">Je gesprek is rechtstreeks met de eigenaar van dit pand: vragen stellen, een bezichtiging plannen of een bod doen. Panvia leest niet mee en verkoopt niets door — we mailen je alleen een seintje als er een antwoord is. Zoeken is gratis; praten en bieden doe je met een kopersabonnement van <span class="tnum">€ 12,95</span> per maand, maandelijks opzegbaar. Zijn contactgegevens deelt de eigenaar zelf in het gesprek, zodra hij merkt dat het serieus is.</p>
             <div id="contact-blok-inhoud" tabindex="-1"></div>
           </div>
         </div>
@@ -124,15 +123,18 @@
             <li><a href="aanbod.html?type=woning">Woningen</a></li>
             <li><a href="aanbod.html?type=commercieel">Bedrijfspanden</a></li>
             <li><a href="aanbod.html?type=vakantie">Vakantiewoningen</a></li>
+            <li><a href="buitenland.html">Buitenland</a></li>
             <li><a href="projecten.html">Projecten</a></li>
             <li><a href="zakelijk.html">Panvia Zakelijk</a></li>
           </ul>
         </div>
         <div>
-          <h3>Verkopen</h3>
+          <h3>Kopen &amp; verkopen</h3>
           <ul>
+            <li><a href="kopers.html">Voor kopers</a></li>
             <li><a href="plaatsen.html">Plaats je pand</a></li>
             <li><a href="projecten.html">Panvia Projecten</a></li>
+            <li><a href="eigenaar.html">Mijn Panvia</a></li>
             <li><a href="index.html">Wat het kost</a></li>
             <li><a href="index.html">Zo werkt het</a></li>
             <li><a href="over.html">Over ons</a></li>
@@ -146,7 +148,7 @@
       </div>
       <p class="footer-groot" aria-hidden="true">Panvia</p>
       <div class="footer-onder">
-        <span>© 2026 Panvia — prototype, geen echt aanbod</span>
+        <span>© 2026 Panvia</span>
         <span>Panvia is geen makelaar.</span>
       </div>
     </div>

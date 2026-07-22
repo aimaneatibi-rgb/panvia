@@ -46,6 +46,19 @@ var PANVIA_CONFIG = {
      ---------------------------------------------------------------------- */
   lanceringsModus: true,
 
+  /* ----------------------------------------------------------------------
+     4. LANCERINGSDATUM
+     ----------------------------------------------------------------------
+     Eén bron voor de datum waarop Panvia opengaat. Wordt getoond in de
+     hero-countdown, de demo-balk en de aanmeldbevestiging. Formaat:
+     "JJJJ-MM-DD" (ISO). Laat leeg ("") om alle datum-/countdownelementen
+     te verbergen en terug te vallen op "binnenkort".
+     ---------------------------------------------------------------------- */
+  lanceringsDatum: "2026-08-17",
+
+  /* Menselijke weergave van diezelfde datum (voor koppen en lopende tekst) */
+  lanceringsDatumTekst: "17 augustus 2026",
+
   /* Publieke basis-URL, gebruikt in sitemap en deelbare links */
   siteUrl: "https://panvia.nl",
 

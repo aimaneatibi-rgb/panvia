@@ -250,6 +250,18 @@ p { margin: 0 0 var(--s-16); }
   border-bottom: 2px solid var(--ultramarijn);
 }
 
+/* Menu-CTA: "Plaats je pand" als compacte knop — de belangrijkste actie */
+.site-nav .nav-cta {
+  background: var(--ultramarijn);
+  color: var(--wit);
+  padding: var(--s-8) var(--s-16);
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: background-color .15s ease;
+}
+.site-nav .nav-cta:hover { background: var(--ultramarijn-hover); color: var(--wit); }
+.site-nav .nav-cta[aria-current="page"] { border-bottom: 0; }
+
 .nav-toggle {
   display: none;
   background: var(--wit);
@@ -261,6 +273,42 @@ p { margin: 0 0 var(--s-16); }
   color: var(--nacht);
   cursor: pointer;
 }
+
+/* Account-blok rechtsboven: inloggen / account maken, of ingelogd */
+.nav-account {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-12);
+  padding-left: var(--s-24);
+  margin-left: var(--s-8);
+  border-left: 1px solid var(--krijt);
+}
+.nav-account a { font-size: 15px; }
+.nav-account .nav-account-maak,
+.nav-account .nav-account-naam {
+  font-weight: 600;
+  color: var(--ultramarijn);
+}
+.nav-account-naam::before {
+  content: "";
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--zegel);
+  vertical-align: middle;
+}
+.nav-uitlog {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--staal);
+  cursor: pointer;
+}
+.nav-uitlog:hover { color: var(--nacht); }
 
 /* --------------------------------------------------------------------------
    5. Knoppen (Brandbook §13) — één primaire knop per scherm
@@ -740,6 +788,18 @@ legend {
   padding: var(--s-48);
   max-width: 480px;
 }
+/* Twee prijsblokken naast elkaar (verkopers + kopers) */
+.prijs-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-24);
+  align-items: start;
+}
+.prijs-duo .prijsblok { max-width: none; }
+@media (max-width: 720px) {
+  .prijs-duo { grid-template-columns: 1fr; }
+}
+
 .prijsblok .label { margin-bottom: var(--s-16); display: block; }
 .prijsblok-bedrag {
   font-family: var(--font-data);
@@ -1111,6 +1171,28 @@ legend {
 .demo-balk a { color: var(--wit); text-decoration: underline; }
 .demo-balk a:hover { color: var(--lucht); }
 
+/* Inlogpagina */
+.login-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-48);
+  align-items: start;
+  max-width: 960px;
+}
+.login-aside h2 { font-size: 20px; }
+.login-keuze { display: grid; gap: var(--s-16); }
+.login-keuze-kaart {
+  background: var(--wit);
+  border: 1px solid var(--krijt);
+  border-radius: var(--radius-kaart);
+  padding: var(--s-24);
+}
+.login-keuze-kaart .label { display: block; margin-bottom: var(--s-8); }
+.login-keuze-kaart .btn { margin-top: var(--s-8); }
+@media (max-width: 720px) {
+  .login-grid { grid-template-columns: 1fr; gap: var(--s-32); }
+}
+
 /* Over ons: wél/niet-lijsten */
 .over-lijst {
   list-style: none;
@@ -1227,7 +1309,54 @@ legend {
 }
 .chat-eigen .chat-bod-note { color: var(--nacht-tekst); }
 .chip-bod { border-color: var(--ultramarijn); color: var(--ultramarijn); background: var(--lucht); }
+.chip-deel { border-color: var(--zegel); color: var(--zegel); }
 .chat-ander .chat-bod-bedrag { color: var(--ultramarijn); }
+
+/* Beveiligde contactkaart — alleen in de chat, met watermerk en afschrikking.
+   Echte screenshotpreventie kan niet op het web; dit maakt het lastiger en
+   maakt een eventueel lek herleidbaar tot de ontvanger. */
+.contactkaart {
+  border: 1px solid var(--zegel);
+  border-left: 3px solid var(--zegel);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.contactkaart .chat-bod-label { color: var(--zegel); }
+.chat-eigen .contactkaart { border-color: var(--nacht-lijn); }
+.contactkaart-data {
+  position: relative;
+  margin: var(--s-8) 0;
+  padding: var(--s-12);
+  background: var(--papier);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: filter .12s ease;
+}
+.chat-eigen .contactkaart-data { background: rgba(255,255,255,.08); }
+.ck-naam { font-weight: 600; margin: 0 0 var(--s-4); }
+.ck-regel { margin: 0; font-size: 15px; }
+/* Watermerk: diagonaal, half doorzichtig, benoemt de ontvanger */
+.contactkaart-merk {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-18deg);
+  font-family: var(--font-data);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(15, 138, 92, .22);
+  pointer-events: none;
+  white-space: nowrap;
+}
+/* Vervagen zodra het venster de focus verliest of de tab verborgen wordt.
+   Twee wegen naar hetzelfde resultaat, voor de zekerheid: de body-class én
+   een directe klasse op de kaart. */
+body.scherm-verborgen .contactkaart-data,
+.contactkaart-data.is-verborgen { filter: blur(9px); }
+body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
 .bod-invoer .veld { margin-bottom: 0; }
 .bod-invoer-rij { display: flex; gap: var(--s-8); }
 .bod-invoer-rij input { flex: 1 1 auto; min-width: 0; }
@@ -1445,8 +1574,91 @@ legend {
 }
 
 /* --------------------------------------------------------------------------
-   14c. Beweging — één rustig reveal-systeem, functioneel en kort
+   14b-bis. Lanceer-eyebrow & countdown — het aftellen naar 17 augustus.
+   Cijfers in mono (het getal is de held), Ultramarijn als enige accent.
    -------------------------------------------------------------------------- */
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-8);
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ultramarijn);
+  margin: 0 0 var(--s-16);
+}
+.cd-punt {
+  width: 8px; height: 8px;
+  background: var(--zegel);            /* Zegelgroen = "beschikbaar/aanstaande" */
+  border-radius: 50%;
+  flex: none;
+}
+
+.countdown {
+  display: flex;
+  gap: var(--s-12);
+  margin-top: var(--s-24);
+  flex-wrap: wrap;
+}
+.cd-blok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  padding: var(--s-12) var(--s-8) var(--s-8);
+  background: var(--lucht);
+  border-top: 3px solid var(--ultramarijn);   /* één accentlijn per component (§11) */
+}
+.cd-getal {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--ultramarijn);
+  letter-spacing: -0.02em;
+}
+.cd-label {
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--staal);
+  margin-top: var(--s-8);
+}
+.cd-live {
+  font-family: var(--font-data);
+  font-size: 14px;
+  color: var(--zegel);
+  letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   14c. Beweging — één rustig systeem, functioneel en kort (Brandbook §11).
+   Alles onder no-preference; bij 'reduce' staat elk element meteen goed.
+   -------------------------------------------------------------------------- */
+
+/* Header verdicht bij het scrollen — een stille statusverandering. De sticky
+   haarlijn wordt iets nadrukkelijker, de balk een fractie compacter. */
+.site-header {
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.site-header.gescrolld {
+  border-bottom-color: var(--staal);
+  box-shadow: 0 1px 0 0 var(--krijt);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-header .header-inner {
+    transition: min-height .2s ease, padding .2s ease;
+  }
+  .site-header.gescrolld .header-inner {
+    min-height: 56px;
+    padding-top: var(--s-8);
+    padding-bottom: var(--s-8);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
     opacity: 0;
@@ -1456,6 +1668,39 @@ legend {
   .reveal.zichtbaar {
     opacity: 1;
     transform: none;
+  }
+
+  /* Hero-intro: de bovenste elementen komen bij het laden gestaffeld omhoog.
+     Actief zodra <html class="js-intro"> gezet is; zonder JS geen animatie,
+     dus de inhoud staat altijd zichtbaar. 'both' houdt begin- en eindstand. */
+  .js-intro .hero-eyebrow,
+  .js-intro .hero .display,
+  .js-intro .hero p.body-l,
+  .js-intro .hero-acties,
+  .js-intro .countdown,
+  .js-intro .hero-microproof,
+  .js-intro .hero-voorbeeld {
+    animation: heroIn .55s ease both;
+  }
+  .js-intro .hero .display      { animation-delay: .06s; }
+  .js-intro .hero p.body-l      { animation-delay: .12s; }
+  .js-intro .hero-acties        { animation-delay: .18s; }
+  .js-intro .countdown          { animation-delay: .24s; }
+  .js-intro .hero-microproof    { animation-delay: .28s; }
+  .js-intro .hero-voorbeeld     { animation-delay: .20s; }
+
+  @keyframes heroIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Het tekentafel-frame achter het hero-voorbeeld schuift zacht op zijn plek. */
+  .js-intro #hero-kaart::before {
+    animation: frameIn .5s ease .34s both;
+  }
+  @keyframes frameIn {
+    from { opacity: 0; top: 0; right: 0; bottom: 0; left: 0; }
+    to   { opacity: 1; top: 14px; right: -14px; bottom: -14px; left: 14px; }
   }
 }
 
@@ -1494,6 +1739,14 @@ legend {
   }
   .site-nav.open { display: block; }
   .site-nav ul { flex-direction: column; align-items: flex-start; gap: var(--s-16); }
+  .nav-account {
+    border-left: 0;
+    padding-left: 0;
+    margin-left: 0;
+    padding-top: var(--s-16);
+    border-top: 1px solid var(--krijt);
+    width: 100%;
+  }
 
   .btn { min-height: 48px; } /* 48px op mobiel */
   .formulier-paneel { padding: var(--s-24); }

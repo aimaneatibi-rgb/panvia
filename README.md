@@ -33,7 +33,7 @@ Open de URL die serve toont (meestal http://localhost:3000).
 | `plaatsen.html` | Meerstaps plaatsingsflow: verkopersaccount + eigenaarsverklaring → adres → type & kenmerken → foto's → prijs → betalen |
 | `spelregels.html` | De spelregels: alleen eigenaren, geen makelaars of dienstenpromotie, boete € 10.000 per overtreding |
 | `over.html` | Over ons: waar we voor staan, missie & visie (eigenaarschap, onafhankelijkheid), wat we bewust niet doen (o.a. geen hypotheken) |
-| `projecten.html` | Panvia Projecten: pakketten voor parken, complexen en ontwikkelaars vanaf 10 eenheden (€ 2.950 / € 5.950 / € 9.950 per 12 mnd) met aanmeldformulier |
+| `projecten.html` | Panvia Projecten: pakketten voor parken, complexen en ontwikkelaars vanaf 10 eenheden (€ 5.950 / € 9.950 / € 14.950 per 12 mnd) met aanmeldformulier |
 | `project.html` | Projectdetailpagina; laadt een project via `?id=` (bv. `project.html?id=p2`), met types, kenmerken en gratis belangstellingsregistratie |
 | `eigenaar.html` | Mijn Panvia (eigenaarskant): inbox met gesprekken en biedingen op het demopand |
 | `zakelijk.html` | Panvia Zakelijk: commercieel aanbod met filters op type, prijs, oppervlakte en BAR |
@@ -52,7 +52,7 @@ Open de URL die serve toont (meestal http://localhost:3000).
 ## Wat gesimuleerd is
 
 - **Betalen**: de knop "Betaal € 895" schrijft niets af en publiceert niets — je ziet een bevestigingsscherm met een prototype-melding. Tarief verkoper: € 895 per plaatsing van 6 maanden.
-- **Kopersaccount**: praten en bieden vereist een kopersaccount van € 8,95 per maand (maandelijks opzegbaar, gesimuleerd — er wordt niets afgeschreven). Het account wordt bewaard in localStorage (`panvia-koper`). Zonder account zie je alleen de advertentie (foto's, vraagprijs, beschrijving, kenmerken): de chat staat dicht en biedingen zijn onzichtbaar.
+- **Kopersabonnement**: praten, bieden en de volledige verkoperinformatie zien vereist een kopersabonnement van € 12,95 per maand (maandelijks opzegbaar, gesimuleerd — er wordt niets afgeschreven). Het account wordt bewaard in localStorage (`panvia-koper`). Zonder abonnement zie je alleen de advertentie (foto's, vraagprijs, beschrijving, kenmerken): de chat staat dicht en biedingen zijn onzichtbaar. De verkooppagina staat op `kopers.html`.
 - **Projecten**: drie demoprojecten (appartementencomplex, vakantiepark, bedrijfsverzamelgebouw) verschijnen elk in het aanbod van hun eigen categorie — filter op woning, vakantie of commercieel en het bijbehorende project komt bovenaan. Belangstelling registreren is gratis en zonder account; dat is het product dat de ontwikkelaar afneemt.
 - **Verkopersaccount**: plaatsen begint met een account (localStorage `panvia-verkoper`) plus een verplichte eigenaarsverklaring: geen makelaar, geen dienstenpromotie, akkoord met de spelregels incl. boete van € 10.000 per overtreding.
 - **Chat met de eigenaar**: na je eerste bericht opent een chatgesprek (à la Marktplaats) met snelstart-vragen. De eigenaar is gesimuleerd; het gesprek wordt per pand bewaard in localStorage en overleeft een herlaad. Er wordt niets verstuurd.

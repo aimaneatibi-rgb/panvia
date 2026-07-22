@@ -39,13 +39,12 @@
       <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <nav id="site-nav" class="site-nav" aria-label="Hoofdnavigatie">
         <ul>
-          <li><a href="index.html" aria-current="page">Home</a></li>
           <li><a href="aanbod.html">Aanbod</a></li>
+          <li><a href="buitenland.html">Buitenland</a></li>
           <li><a href="zakelijk.html">Zakelijk</a></li>
-          <li><a href="plaatsen.html">Plaats je pand</a></li>
           <li><a href="projecten.html">Projecten</a></li>
-          <li><a href="eigenaar.html">Mijn Panvia</a></li>
-          <li><a href="over.html">Over ons</a></li>
+          <li><a class="nav-cta" href="plaatsen.html">Plaats je pand</a></li>
+          <li class="nav-account" id="nav-account"></li>
         </ul>
       </nav>
     </div>
@@ -57,12 +56,14 @@
     <section class="hero">
       <div class="container hero-grid">
         <div>
+          <p class="hero-eyebrow"><span class="cd-punt" aria-hidden="true"></span>Live vanaf 17 augustus 2026</p>
           <h1 class="display">Het is <em>jouw</em> pand.<br>Dus jij verkoopt het.</h1>
           <p class="body-l">Plaats je woning, bedrijfspand of vakantiewoning op Panvia voor <strong class="tnum">€ 895</strong> — zes maanden online, inclusief btw. Je praat rechtstreeks met kopers. Geen makelaar ertussen, geen courtage erachteraan.</p>
           <div class="hero-acties">
             <a class="btn btn-primair" href="plaatsen.html">Plaats mijn pand</a>
             <a class="btn btn-secundair" href="aanbod.html">Bekijk het aanbod</a>
           </div>
+          <div id="lancering-countdown" class="countdown" role="timer" aria-label="Aftellen tot de lancering van Panvia"></div>
           <p class="hero-microproof">€ 895 per plaatsing · binnen een dag online · 6 maanden zichtbaar</p>
         </div>
         <div class="hero-voorbeeld">
@@ -103,7 +104,7 @@
         </div>
         <div class="reken-grid">
           <div>
-            <p class="body-l">Er is één plek waar heel Nederland vastgoed zoekt — en die plek is gesloten voor de eigenaar zelf. Funda werkt uitsluitend via aangesloten makelaarskantoren. Wil je zonder makelaar verkopen, dan moet je er alsnog één inhuren. Puur om zichtbaar te zijn.</p>
+            <p class="body-l">Er is één plek waar heel Nederland vastgoed zoekt — en die plek is gesloten voor de eigenaar zelf. De grote vastgoedportal werkt uitsluitend via aangesloten makelaarskantoren. Wil je zonder makelaar verkopen, dan moet je er alsnog één inhuren. Puur om zichtbaar te zijn.</p>
           </div>
           <div>
             <p class="body-l"><strong>Panvia is de directe route.</strong> Je plaatst je pand, je wordt gevonden, je praat zelf met de koper. Eén bedrag, vooraf bekend. Geen percentage van jouw opbrengst voor werk dat je zelf doet.</p>
@@ -180,17 +181,36 @@
     <!-- Prijsblok (brandbook §13) -->
     <section class="sectie sectie-wit">
       <div class="container">
-        <div class="prijsblok">
-          <span class="label">Wat het kost</span>
-          <p class="prijsblok-bedrag">€ 895</p>
-          <p class="prijsblok-sub">per plaatsing van 6 maanden, incl. btw</p>
-          <ul>
-            <li>Je pand staat 6 maanden online.</li>
-            <li>Geen courtage. Geen succesfee.</li>
-            <li>Geen verrassingen.</li>
-          </ul>
-          <a class="btn btn-primair" href="plaatsen.html">Plaats mijn pand</a>
+        <div class="sectie-kop">
+          <span class="kop-label">Wat het kost</span>
+          <h2>Eén vaste prijs voor verkopers, één voor kopers</h2>
+          <p>Geen courtage, geen succesfee, geen verrassingen. Je weet vooraf precies wat je betaalt.</p>
         </div>
+        <div class="prijs-duo">
+          <div class="prijsblok">
+            <span class="label">Verkopers</span>
+            <p class="prijsblok-bedrag">€ 895</p>
+            <p class="prijsblok-sub">per plaatsing van 6 maanden, incl. btw</p>
+            <ul>
+              <li>Je pand staat 6 maanden online.</li>
+              <li>Geen courtage. Geen succesfee.</li>
+              <li>Rechtstreeks contact met kopers.</li>
+            </ul>
+            <a class="btn btn-primair" href="plaatsen.html">Plaats mijn pand</a>
+          </div>
+          <div class="prijsblok">
+            <span class="label">Kopers</span>
+            <p class="prijsblok-bedrag">€ 12,95</p>
+            <p class="prijsblok-sub">per maand, maandelijks opzegbaar</p>
+            <ul>
+              <li>Zoeken en kijken blijft gratis.</li>
+              <li>Praat rechtstreeks met elke eigenaar en doe biedingen.</li>
+              <li>Geldig voor alle panden, ook het buitenland.</li>
+            </ul>
+            <a class="btn btn-secundair" href="kopers.html">Word koper</a>
+          </div>
+        </div>
+        <p class="klein grijs" style="margin-top: 24px; max-width: 640px;">Verkoop je tien eenheden of meer — een park, complex of ontwikkeling? Dan betaal je per project, vanaf <span class="tnum">€ 5.950</span> voor 12 maanden. Bekijk <a href="projecten.html">Panvia Projecten</a>.</p>
       </div>
     </section>
 
@@ -228,8 +248,8 @@
               <tr>
                 <th scope="row">Waar je pand staat</th>
                 <td class="vergelijk-panvia">Op Panvia</td>
-                <td>Op Funda</td>
-                <td>Op Funda</td>
+                <td>Op de grote portal</td>
+                <td>Op de grote portal</td>
               </tr>
               <tr>
                 <th scope="row">Wie de prijs bepaalt</th>
@@ -246,7 +266,7 @@
             </tbody>
           </table>
         </div>
-        <p class="vergelijk-nb klein grijs">Eerlijk is eerlijk: wil je per se op Funda staan of het hele traject uit handen geven, dan past een (internet)makelaar beter. Panvia is er voor wie het zelf doet — en daar niet extra voor wil betalen.</p>
+        <p class="vergelijk-nb klein grijs">Eerlijk is eerlijk: wil je per se op de grote portal staan of het hele traject uit handen geven, dan past een (internet)makelaar beter. Panvia is er voor wie het zelf doet — en daar niet extra voor wil betalen.</p>
       </div>
     </section>
 
@@ -269,8 +289,8 @@
         <div class="sectie-kop">
           <span class="kop-label">Voor kopers</span>
           <h2>Op zoek naar een pand? Aanbod dat je nergens anders vindt.</h2>
-          <p class="body-l">Panden op Panvia staan hier rechtstreeks van de eigenaar — vaak staan ze nergens anders. En omdat er geen makelaar tussen zit, hoor je het echte verhaal: wat er goed is, wat er speelt, en waarom de eigenaar verkoopt. Zoeken kost niets; praten en bieden doe je met een kopersaccount van <span class="tnum">€ 8,95</span> per maand — maandelijks opzegbaar, zodat eigenaren alleen serieuze kopers spreken.</p>
-          <p><a href="aanbod.html">Bekijk het aanbod →</a></p>
+          <p class="body-l">Panden op Panvia staan hier rechtstreeks van de eigenaar — vaak staan ze nergens anders. En omdat er geen makelaar tussen zit, hoor je het echte verhaal: wat er goed is, wat er speelt, en waarom de eigenaar verkoopt. Zoeken kost niets; praten en bieden doe je met een kopersabonnement van <span class="tnum">€ 12,95</span> per maand — maandelijks opzegbaar, zodat eigenaren alleen serieuze kopers spreken. Contactgegevens deelt de eigenaar zelf in het gesprek. <a href="kopers.html">Zo werkt het →</a></p>
+          <p><a href="aanbod.html">Bekijk het aanbod →</a> &nbsp;·&nbsp; <a href="buitenland.html">Vastgoed in het buitenland →</a></p>
         </div>
         <div class="alert-blok" id="alert-blok">
           <span class="label">Nieuw aanbod in je mail</span>
@@ -296,15 +316,15 @@
         </div>
         <div class="faq">
           <details>
-            <summary>Wordt mijn pand wel gezien zonder Funda?</summary>
+            <summary>Wordt mijn pand wel gezien zonder de grote portal?</summary>
             <div class="faq-antwoord">
-              <p>We beloven je geen zes miljoen bezoekers — die belofte kan alleen Funda doen. Wat je wél krijgt: kopers die hier komen omdat dit aanbod nergens anders staat, een kijkcijfer per pand dat je gewoon kunt zien, en een advertentielink die je zelf deelt met je netwerk en op je socials. Bij commercieel vastgoed ken je je koper vaak al — dan is zichtbaarheid het enige dat je mist, en dat is precies wat je hier koopt.</p>
+              <p>We beloven je geen zes miljoen bezoekers — die belofte kan alleen de grootste portal doen. Wat je wél krijgt: kopers die hier komen omdat dit aanbod nergens anders staat, een kijkcijfer per pand dat je gewoon kunt zien, en een advertentielink die je zelf deelt met je netwerk en op je socials. Bij commercieel vastgoed ken je je koper vaak al — dan is zichtbaarheid het enige dat je mist, en dat is precies wat je hier koopt.</p>
             </div>
           </details>
           <details>
             <summary>Wat kost Panvia voor kopers?</summary>
             <div class="faq-antwoord">
-              <p>Zoeken en kijken is gratis. Wil je met een eigenaar praten of een bod doen, dan neem je een kopersaccount van <span class="tnum">€ 8,95</span> per maand — geldig voor alle panden, maandelijks opzegbaar, dus je betaalt alleen in de maanden dat je echt zoekt. Waarom niet gratis? Omdat die drempel spam en vrijblijvend gesnuffel buiten de deur houdt. De eigenaar weet: wie schrijft, meent het. En jij krijgt daardoor antwoord.</p>
+              <p>Zoeken en kijken is gratis. Wil je met een eigenaar praten of een bod doen, dan neem je een kopersabonnement van <span class="tnum">€ 12,95</span> per maand — geldig voor alle panden, maandelijks opzegbaar, dus je betaalt alleen in de maanden dat je echt zoekt. De contactgegevens van de eigenaar deelt hij zelf in het gesprek, zodra hij merkt dat het serieus is. Waarom niet gratis? Omdat die drempel spam buiten de deur houdt — de eigenaar weet: wie schrijft, meent het. Lees meer op <a href="kopers.html">Voor kopers</a>.</p>
             </div>
           </details>
           <details>
@@ -322,7 +342,7 @@
           <details>
             <summary>Ik verkoop een park of complex — geldt dat tarief dan per woning?</summary>
             <div class="faq-antwoord">
-              <p>Nee. Vanaf tien eenheden betaal je per project, niet per woning: vanaf <span class="tnum">€ 2.950</span> voor 12 maanden, inclusief een eigen projectpagina, een belangstellendenlijst en leadrapportage. Ter vergelijking: een nieuwbouwmakelaar rekent al gauw <span class="tnum">€ 126.000</span> courtage over dertig appartementen. Bekijk <a href="projecten.html">Panvia Projecten</a>.</p>
+              <p>Nee. Vanaf tien eenheden betaal je per project, niet per woning: vanaf <span class="tnum">€ 5.950</span> voor 12 maanden, inclusief een eigen projectpagina, een belangstellendenlijst en leadrapportage. Ter vergelijking: een nieuwbouwmakelaar rekent al gauw <span class="tnum">€ 126.000</span> courtage over dertig appartementen. Bekijk <a href="projecten.html">Panvia Projecten</a>.</p>
             </div>
           </details>
           <details>
@@ -382,15 +402,18 @@
             <li><a href="aanbod.html?type=woning">Woningen</a></li>
             <li><a href="aanbod.html?type=commercieel">Bedrijfspanden</a></li>
             <li><a href="aanbod.html?type=vakantie">Vakantiewoningen</a></li>
+            <li><a href="buitenland.html">Buitenland</a></li>
             <li><a href="projecten.html">Projecten</a></li>
             <li><a href="zakelijk.html">Panvia Zakelijk</a></li>
           </ul>
         </div>
         <div>
-          <h3>Verkopen</h3>
+          <h3>Kopen &amp; verkopen</h3>
           <ul>
+            <li><a href="kopers.html">Voor kopers</a></li>
             <li><a href="plaatsen.html">Plaats je pand</a></li>
             <li><a href="projecten.html">Panvia Projecten</a></li>
+            <li><a href="eigenaar.html">Mijn Panvia</a></li>
             <li><a href="index.html#rekenen">Reken het na</a></li>
             <li><a href="index.html#inhoud">Zo werkt het</a></li>
             <li><a href="over.html">Over ons</a></li>
@@ -404,7 +427,7 @@
       </div>
       <p class="footer-groot" aria-hidden="true">Panvia</p>
       <div class="footer-onder">
-        <span>© 2026 Panvia — prototype, geen echt aanbod</span>
+        <span>© 2026 Panvia</span>
         <span>Panvia is geen makelaar.</span>
       </div>
     </div>

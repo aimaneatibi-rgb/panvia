@@ -16,6 +16,11 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://panvia.nl/buitenland.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://panvia.nl/zakelijk.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -24,6 +29,16 @@
     <loc>https://panvia.nl/projecten.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://panvia.nl/kopers.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://panvia.nl/inloggen.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://panvia.nl/over.html</loc>

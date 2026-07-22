@@ -3,22 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aanbod — rechtstreeks van eigenaar | Panvia</title>
-  <meta name="description" content="Woningen, bedrijfspanden en vakantiewoningen — in Nederland en daarbuiten — rechtstreeks van de eigenaar. Geen makelaar ertussen; je vindt hier wat elders niet staat.">
-  <link rel="canonical" href="https://panvia.nl/aanbod.html">
+  <title>Vastgoed in het buitenland — rechtstreeks van de eigenaar | Panvia</title>
+  <meta name="description" content="Vakantiewoningen, villa's en tweede huizen in het buitenland — in Spanje, Portugal, Frankrijk, Italië en meer. Rechtstreeks van de Nederlandse of lokale eigenaar, zonder makelaar ertussen.">
+  <link rel="canonical" href="https://panvia.nl/buitenland.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Panvia">
   <meta property="og:locale" content="nl_NL">
-  <meta property="og:url" content="https://panvia.nl/aanbod.html">
-  <meta property="og:title" content="Aanbod — rechtstreeks van eigenaar | Panvia">
-  <meta property="og:description" content="Woningen, bedrijfspanden en vakantiewoningen, rechtstreeks van de eigenaar. Geen makelaar ertussen.">
+  <meta property="og:url" content="https://panvia.nl/buitenland.html">
+  <meta property="og:title" content="Vastgoed in het buitenland — rechtstreeks van de eigenaar">
+  <meta property="og:description" content="Vakantiewoningen, villa's en tweede huizen in Spanje, Portugal, Frankrijk, Italië en meer. Rechtstreeks van de eigenaar, zonder makelaar.">
   <meta property="og:image" content="https://panvia.nl/img/og-panvia.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Panvia — Vastgoed in eigen hand.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Aanbod — rechtstreeks van eigenaar | Panvia">
-  <meta name="twitter:description" content="Woningen, bedrijfspanden en vakantiewoningen, rechtstreeks van de eigenaar. Geen makelaar ertussen.">
+  <meta name="twitter:title" content="Vastgoed in het buitenland — rechtstreeks van de eigenaar">
+  <meta name="twitter:description" content="Vakantiewoningen, villa's en tweede huizen in Spanje, Portugal, Frankrijk, Italië en meer. Rechtstreeks van de eigenaar.">
   <meta name="twitter:image" content="https://panvia.nl/img/og-panvia.png">
   <meta name="theme-color" content="#2438D8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +26,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232438D8'/%3E%3Crect x='21' width='11' height='11' fill='%23FFFFFF'/%3E%3Cpath d='M9 23 L21 11' stroke='%23FFFFFF' stroke-width='3' fill='none'/%3E%3Ccircle cx='26.5' cy='5.5' r='3.5' fill='%232438D8'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/panvia.css">
 </head>
-<body data-page="aanbod">
+<body data-page="buitenland">
   <a class="skip-link" href="#inhoud">Ga direct naar de inhoud</a>
 
   <header class="site-header">
@@ -39,8 +38,8 @@
       <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <nav id="site-nav" class="site-nav" aria-label="Hoofdnavigatie">
         <ul>
-          <li><a href="aanbod.html" aria-current="page">Aanbod</a></li>
-          <li><a href="buitenland.html">Buitenland</a></li>
+          <li><a href="aanbod.html">Aanbod</a></li>
+          <li><a href="buitenland.html" aria-current="page">Buitenland</a></li>
           <li><a href="zakelijk.html">Zakelijk</a></li>
           <li><a href="projecten.html">Projecten</a></li>
           <li><a class="nav-cta" href="plaatsen.html">Plaats je pand</a></li>
@@ -54,33 +53,25 @@
     <section class="sectie-krap">
       <div class="container">
         <div class="sectie-kop" style="margin-bottom: 32px;">
-          <h1>Aanbod</h1>
-          <p class="body-l">Elk pand hier is geplaatst door de eigenaar zelf. Neem je contact op, dan praat je meteen met de persoon die kan beslissen.</p>
-          <p class="klein" style="margin-top: 12px;">Zoek je een plek in de zon? Bekijk <a href="buitenland.html">al het vastgoed in het buitenland →</a></p>
+          <span class="kop-label">Buitenland</span>
+          <h1>Een plek in de zon, <em>rechtstreeks</em> van de eigenaar</h1>
+          <p class="body-l">Vakantiewoningen, villa's en tweede huizen buiten Nederland — vaak van Nederlandse eigenaren die zelf verkopen. Geen makelaar ertussen, dus je hoort het echte verhaal en betaalt geen courtage. De koop verloopt naar lokaal recht; dat staat eerlijk bij elke advertentie.</p>
         </div>
 
-        <form class="filterbalk" aria-label="Filter het aanbod" onsubmit="return false;">
+        <form class="filterbalk" aria-label="Filter het buitenlandse aanbod" onsubmit="return false;">
+          <div class="veld">
+            <label for="filter-land">Land</label>
+            <select id="filter-land">
+              <option value="">Alle landen</option>
+            </select>
+          </div>
           <div class="veld">
             <label for="filter-type">Type</label>
             <select id="filter-type">
               <option value="">Alles</option>
+              <option value="vakantie">Vakantiewoning</option>
               <option value="woning">Woning</option>
               <option value="commercieel">Bedrijfspand</option>
-              <option value="vakantie">Vakantiewoning</option>
-            </select>
-          </div>
-          <div class="veld">
-            <label for="filter-land">Ligging</label>
-            <select id="filter-land">
-              <option value="">Overal</option>
-              <option value="Nederland">Nederland</option>
-              <option value="Buitenland">Buitenland</option>
-            </select>
-          </div>
-          <div class="veld">
-            <label for="filter-plaats">Plaats</label>
-            <select id="filter-plaats">
-              <option value="">Alle plaatsen</option>
             </select>
           </div>
           <div class="veld">
@@ -88,21 +79,9 @@
             <select id="filter-prijs" class="tnum">
               <option value="">Geen maximum</option>
               <option value="300000">Tot € 300.000</option>
+              <option value="400000">Tot € 400.000</option>
               <option value="500000">Tot € 500.000</option>
               <option value="750000">Tot € 750.000</option>
-              <option value="1000000">Tot € 1.000.000</option>
-              <option value="1500000">Tot € 1.500.000</option>
-            </select>
-          </div>
-          <div class="veld">
-            <label for="filter-opp">Oppervlakte</label>
-            <select id="filter-opp" class="tnum">
-              <option value="">Elke oppervlakte</option>
-              <option value="75">Vanaf 75 m²</option>
-              <option value="100">Vanaf 100 m²</option>
-              <option value="150">Vanaf 150 m²</option>
-              <option value="500">Vanaf 500 m²</option>
-              <option value="1000">Vanaf 1.000 m²</option>
             </select>
           </div>
           <button type="button" id="wis-filters" class="btn btn-tertiair">Wis mijn filters</button>
@@ -110,21 +89,33 @@
 
         <p id="resultaat-teller" class="resultaat-teller" aria-live="polite"></p>
 
-        <div id="projecten-strip" class="projecten-strip" hidden></div>
-
-        <div id="aanbod-grid" class="kaarten-grid"></div>
+        <div id="buitenland-grid" class="kaarten-grid"></div>
 
         <div id="leeg-melding" class="leeg-melding" hidden>
           <h2>Geen panden binnen deze filters</h2>
-          <p>Verruim een filter of wis ze allemaal. Nieuw aanbod komt er rechtstreeks van eigenaren bij — niet via kantoren, dus soms in golven.</p>
+          <p>Verruim een filter of wis ze allemaal. Nieuw buitenlands aanbod komt er rechtstreeks van eigenaren bij — soms in golven.</p>
         </div>
       </div>
     </section>
 
+    <!-- Eerlijk over kopen in het buitenland -->
     <section class="sectie-krap">
       <div class="container">
         <div class="nb-blok" style="max-width: 720px;">
-          <p style="margin: 0;"><strong>Staat jouw pand hier nog niet?</strong> Plaatsen kost <span class="tnum">€ 895</span> voor 6 maanden, inclusief btw. Geen courtage, geen succesfee. <a href="plaatsen.html">Plaats je pand</a>.</p>
+          <p style="margin: 0 0 12px;"><strong>Kopen over de grens — wat je moet weten.</strong> Elk land heeft zijn eigen koopproces. In Spanje koop je via een <em>notario</em> en meestal een <em>gestor</em>, in Frankrijk via een <em>notaire</em>, in Portugal via een <em>advogado</em>, in Italië via een <em>notaio</em>. Reken op lokale belastingen en overdrachtskosten bovenop de vraagprijs.</p>
+          <p style="margin: 0;">Panvia maakt het pand vindbaar en verbindt je met de eigenaar. Wij <strong>taxeren niet, bemiddelen niet en geven geen juridisch of fiscaal advies</strong> — daarvoor schakel je een lokale professional in. Wij geven informatie, geen advies.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Verkoper-CTA -->
+    <section class="sectie sectie-nacht">
+      <div class="container">
+        <div class="sectie-kop">
+          <span class="kop-label">Zelf een plek in het buitenland?</span>
+          <h2>Verkoop je tweede huis rechtstreeks</h2>
+          <p class="body-l">Heb je een vakantiewoning of tweede huis in het buitenland? Plaats het op Panvia voor <span class="tnum">€ 895</span> — zes maanden online, inclusief btw. Je bereikt Nederlandse kopers die gericht in het buitenland zoeken, en je praat rechtstreeks met ze. Geen courtage, geen tussenpersoon.</p>
+          <p><a class="btn btn-primair" href="plaatsen.html">Plaats mijn pand</a></p>
         </div>
       </div>
     </section>
@@ -147,7 +138,6 @@
             <li><a href="aanbod.html?type=vakantie">Vakantiewoningen</a></li>
             <li><a href="buitenland.html">Buitenland</a></li>
             <li><a href="projecten.html">Projecten</a></li>
-            <li><a href="zakelijk.html">Panvia Zakelijk</a></li>
           </ul>
         </div>
         <div>
@@ -157,8 +147,6 @@
             <li><a href="plaatsen.html">Plaats je pand</a></li>
             <li><a href="projecten.html">Panvia Projecten</a></li>
             <li><a href="eigenaar.html">Mijn Panvia</a></li>
-            <li><a href="index.html">Wat het kost</a></li>
-            <li><a href="index.html">Zo werkt het</a></li>
             <li><a href="over.html">Over ons</a></li>
             <li><a href="spelregels.html">Spelregels</a></li>
           </ul>
