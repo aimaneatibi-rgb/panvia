@@ -47,6 +47,18 @@ var PANVIA_CONFIG = {
   lanceringsModus: false,
 
   /* ----------------------------------------------------------------------
+     3b. BETAALMODUS — echt betalen via Mollie of het prototype
+     ----------------------------------------------------------------------
+     "auto"      = op localhost simuleren (daar draait geen backend),
+                   overal anders écht betalen via Mollie. Aanbevolen.
+     "mollie"    = altijd echt betalen (api/mollie/* op Vercel; vereist de
+                   environment variables MOLLIE_API_KEY, SUPABASE_URL en
+                   SUPABASE_SERVICE_ROLE_KEY, plus supabase-schema.sql).
+     "simulatie" = altijd het prototype (er wordt nooit afgeschreven).
+     ---------------------------------------------------------------------- */
+  betaalModus: "auto",
+
+  /* ----------------------------------------------------------------------
      4. LANCERINGSDATUM
      ----------------------------------------------------------------------
      Eén bron voor de datum waarop Panvia opengaat. Wordt getoond in de
