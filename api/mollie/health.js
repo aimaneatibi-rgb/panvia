@@ -33,7 +33,7 @@ module.exports = async function (req, res) {
 
   /* Mollie-rondje: methods opvragen is gratis en zonder bijwerkingen. */
   try {
-    const r = await fetch("https://api.mollie.com/v2/methods?limit=1", {
+    const r = await fetch("https://api.mollie.com/v2/methods", {
       headers: { "Authorization": "Bearer " + (process.env.MOLLIE_API_KEY || "") }
     });
     if (r.ok) { uitkomst.mollie.ok = true; }
