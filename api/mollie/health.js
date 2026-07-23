@@ -23,9 +23,15 @@ module.exports = async function (req, res) {
     mollie: { ok: false, fout: null }
   };
 
-  /* Database-rondje: telt alleen, leest geen data. */
+  /* Database-rondje: échte schrijf-test (insert + delete van een healthrij).
+     Alleen de sb_secret/service-role key mag door RLS heen schrijven — met de
+     publishable key faalt dit, en dat is precies wat we willen weten. */
   try {
-    await db("/betalingen?select=id&limit=1");
+    const rij = await db("/betalingen", {
+      method: "POST",
+      body: { ref: require("crypto").randomUUID(), soort: "koper", email: "health@check.local", bedrag: 0, status: "health" }
+    });
+    await db("/betalingen?id=eq." + rij[0].id, { method: "DELETE", prefer: "return=minimal" });
     uitkomst.database.ok = true;
   } catch (e) {
     uitkomst.database.fout = String(e.message || e).slice(0, 200);
