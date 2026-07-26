@@ -13,8 +13,10 @@
 
 /* Tarieven — server-side vastgelegd; het bedrag komt NOOIT uit de client. */
 const TARIEVEN = {
-  koper:    { value: "12.95",  omschrijving: "Panvia kopersabonnement — eerste maand" },
-  verkoper: { value: "895.00", omschrijving: "Panvia plaatsing — 6 maanden online" }
+  koper:    { value: "12.95",   omschrijving: "Panvia kopersabonnement — eerste maand" },
+  /* € 895 excl. btw + 21% = € 1.082,95 — de advertentieprijs is exclusief,
+     de afrekening bij Mollie is het totaal inclusief btw. */
+  verkoper: { value: "1082.95", omschrijving: "Panvia plaatsing — 6 maanden online (€ 895 + 21% btw)" }
 };
 
 function env(naam) {

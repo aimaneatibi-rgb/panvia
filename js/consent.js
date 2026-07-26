@@ -19,7 +19,7 @@
    zetten tegenhouden tót de bezoeker toestemming geeft.
    ========================================================================== */
 
-var PANVIA_COOKIEBOT_ID = "";
+var PANVIA_COOKIEBOT_ID = "2fe07f14-48f7-4291-af50-9205122a88bc";
 
 if (PANVIA_COOKIEBOT_ID) {
   /* document.write tijdens het parsen van de head is hier bewust: het plaatst

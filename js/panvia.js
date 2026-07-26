@@ -1767,7 +1767,7 @@
         "<div class='bevestiging'>" +
           "<div class='vink' aria-hidden='true'>✓</div>" +
           "<h2>Betaald. Je pand staat klaar.</h2>" +
-          "<p class='grijs'>Je betaalde " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden, exclusief btw. We controleren je advertentie en zetten hem daarna online — je hoort van ons op " + escapeHTML(d.email || "je e-mailadres") + ". Geen courtage erachteraan, ook niet als je pand verkoopt.</p>" +
+          "<p class='grijs'>Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 6 maanden. We controleren je advertentie en zetten hem daarna online — je hoort van ons op " + escapeHTML(d.email || "je e-mailadres") + ". Geen courtage erachteraan, ook niet als je pand verkoopt.</p>" +
           inlogRegel(d) +
           "<p style='margin-top:24px'><a class='btn btn-primair' href='eigenaar.html'>Naar Mijn Panvia</a> " +
           "<a class='btn btn-tertiair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
@@ -2709,7 +2709,7 @@
         ["Energielabel", gegevens.energielabel],
         ["Foto’s", gegevens.fotos.length ? gegevens.fotos.length + " gekozen" : "Nog geen — kan later"],
         ["Vraagprijs", fmtPrijs(gegevens.vraagprijs) + " " + gegevens.kk],
-        ["Plaatsingsfee", fmtPrijs(PANVIA_FEE) + " voor 6 maanden, excl. btw"]
+        ["Plaatsingsfee", fmtPrijs(PANVIA_FEE) + " excl. btw · afrekening € 1.082,95 incl. 21% btw, voor 6 maanden"]
       ];
       $("#overzicht-body").innerHTML = rijen.map(function (r) {
         return "<tr><th scope='row'>" + r[0] + "</th><td class='tnum'>" + r[1] + "</td></tr>";
@@ -2792,7 +2792,7 @@
           : "<div class='bevestiging'>" +
               "<div class='vink' aria-hidden='true'>✓</div>" +
               "<h2>Betaald. Je pand staat klaar.</h2>" +
-              "<p class='grijs'>Je betaalde " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden, exclusief btw. Geen courtage erachteraan — " +
+              "<p class='grijs'>Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 6 maanden. Geen courtage erachteraan — " +
               "ook niet als je pand verkoopt. " + (gegevens.adres || "Je pand") + " gaat na een korte controle online " +
               "en staat 6 maanden op Panvia. Kopers nemen rechtstreeks contact met je op.</p>" +
               "<p class='grijs'>Wat wij nu doen: je advertentie controleren en publiceren. " +
@@ -2837,10 +2837,10 @@
           /* Simulatie (localhost): het prototype-betaalscherm, daarna afronden. */
           indicator.hidden = true;
           mollieCheckout(paneel, {
-            bedrag: fmtPrijs(PANVIA_FEE),
-            periode: "6 maanden online, excl. btw",
+            bedrag: "€ 1.082,95",
+            periode: "6 maanden online — € 895 + 21% btw",
             omschrijving: "Panvia plaatsing",
-            knopLabel: "Betaal " + fmtPrijs(PANVIA_FEE),
+            knopLabel: "Betaal € 1.082,95",
             klein: "Eenmalig — geen courtage, geen succesfee.",
             onTerug: function () {
               indicator.hidden = false;
@@ -3040,7 +3040,7 @@
       var slot = $(".klein.grijs", betaalStap);
       if (slot) {
         slot.innerHTML = "<strong>Je betaalt vandaag niets.</strong> Plaatsen kost straks <span class='tnum'>" +
-          fmtPrijs(PANVIA_FEE) + "</span> voor 6 maanden, exclusief btw — pas nadat je akkoord geeft. Geen courtage, geen succesfee.";
+          fmtPrijs(PANVIA_FEE) + "</span> excl. btw voor 6 maanden (afrekening € 1.082,95 incl. 21% btw) — pas nadat je akkoord geeft. Geen courtage, geen succesfee.";
       }
     }
     /* Indicatorlabel meeveranderen */
