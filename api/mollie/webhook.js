@@ -5,7 +5,9 @@
 
    Bij status "paid":
    1. betalingen-rij bijwerken
-   2. account aanmaken/activeren (betaald = true)  ← DE betaal-gate
+   2. account aanmaken of de rol erop activeren  ← DE betaal-gate
+      Eén account per e-mailadres: wie koper wás en nu ook verkoopt, krijgt
+      er een rol bij en houdt dezelfde inlog.
    3. koper: abonnement van € 12,95/mnd starten (ingang volgende maand,
       de eerste betaling dekt maand 1) — eenmalig, idempotent.
    ========================================================================== */
@@ -45,18 +47,41 @@ module.exports = async function (req, res) {
     });
 
     if (status === "paid") {
-      /* 2. Account pas nu — na de betaling. Upsert op (email, soort). */
-      await db("/accounts?on_conflict=email,soort", {
-        method: "POST",
-        prefer: "resolution=merge-duplicates,return=minimal",
-        body: {
-          email: rij.email,
-          naam: rij.naam,
-          soort: rij.soort,
-          betaald: true,
-          mollie_customer_id: rij.mollie_customer_id
-        }
-      });
+      const nu = new Date().toISOString();
+      const rolVeld = rij.soort === "koper" ? "koper_actief" : "verkoper_actief";
+      const sindsVeld = rij.soort === "koper" ? "koper_sinds" : "verkoper_sinds";
+
+      /* 2. Account: bestaat het al, dan komt de rol erbij. Bestaande naam en
+            wachtwoord blijven staan — een nieuwe betaling mag nooit iemands
+            wachtwoord overschrijven. */
+      const gevonden = await db("/accounts?email=eq." + encodeURIComponent(rij.email) + "&select=*");
+      const account = gevonden && gevonden[0];
+
+      if (!account) {
+        await db("/accounts", {
+          method: "POST",
+          prefer: "return=minimal",
+          body: Object.assign({
+            email: rij.email,
+            naam: rij.naam,
+            wachtwoord_hash: rij.wachtwoord_hash,
+            soort: rij.soort,          /* legacy-kolom, voor oude rapportages */
+            betaald: true,             /* legacy-kolom */
+            mollie_customer_id: rij.mollie_customer_id
+          }, { [rolVeld]: true, [sindsVeld]: nu })
+        });
+      } else {
+        const wijziging = Object.assign({ betaald: true }, { [rolVeld]: true });
+        if (!account[sindsVeld]) wijziging[sindsVeld] = nu;
+        if (!account.naam && rij.naam) wijziging.naam = rij.naam;
+        if (!account.wachtwoord_hash && rij.wachtwoord_hash) wijziging.wachtwoord_hash = rij.wachtwoord_hash;
+        if (!account.mollie_customer_id && rij.mollie_customer_id) wijziging.mollie_customer_id = rij.mollie_customer_id;
+        await db("/accounts?id=eq." + account.id, {
+          method: "PATCH",
+          prefer: "return=minimal",
+          body: wijziging
+        });
+      }
 
       /* 3. Koper: abonnement starten (één keer). */
       if (rij.soort === "koper" && rij.mollie_customer_id && !rij.mollie_subscription_id) {
@@ -78,7 +103,7 @@ module.exports = async function (req, res) {
           prefer: "return=minimal",
           body: { mollie_subscription_id: abo.id }
         });
-        await db("/accounts?email=eq." + encodeURIComponent(rij.email) + "&soort=eq.koper", {
+        await db("/accounts?email=eq." + encodeURIComponent(rij.email), {
           method: "PATCH",
           prefer: "return=minimal",
           body: { mollie_subscription_id: abo.id }

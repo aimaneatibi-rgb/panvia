@@ -8,10 +8,11 @@
   <meta name="robots" content="noindex">
   <link rel="canonical" href="https://panvia.nl/inloggen.html">
   <meta name="theme-color" content="#2438D8">
+  <script src="js/consent.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232438D8'/%3E%3Crect x='21' width='11' height='11' fill='%23FFFFFF'/%3E%3Cpath d='M9 23 L21 11' stroke='%23FFFFFF' stroke-width='3' fill='none'/%3E%3Ccircle cx='26.5' cy='5.5' r='3.5' fill='%232438D8'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232438D8'/%3E%3Cpath d='M14 32 L32 17 L50 32 L50 49 A3 3 0 0 1 47 52 L38 52 L38 41 A3 3 0 0 0 35 38 L29 38 A3 3 0 0 0 26 41 L26 52 L17 52 A3 3 0 0 1 14 49 Z' fill='none' stroke='%23FFFFFF' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/panvia.css">
 </head>
 <body data-page="inloggen">
@@ -30,6 +31,7 @@
           <li><a href="buitenland.html">Buitenland</a></li>
           <li><a href="zakelijk.html">Zakelijk</a></li>
           <li><a href="projecten.html">Projecten</a></li>
+          <li><a href="gidsen.html">Gidsen</a></li>
           <li><a class="nav-cta" href="plaatsen.html">Plaats je pand</a></li>
           <li class="nav-account" id="nav-account"></li>
         </ul>
@@ -43,7 +45,7 @@
         <div class="sectie-kop" style="margin-bottom: 32px;">
           <span class="kop-label">Account</span>
           <h1>Inloggen bij Panvia</h1>
-          <p class="body-l">Log in met het e-mailadres van je account. Nog geen account? Kies hieronder of je koopt of verkoopt.</p>
+          <p class="body-l">Eén account voor kopen én verkopen. Log in met je e-mailadres en wachtwoord — welke rol je ook hebt.</p>
         </div>
 
         <div class="login-grid">
@@ -52,15 +54,22 @@
               <div class="veld">
                 <label for="login-email">Je e-mailadres</label>
                 <input type="email" id="login-email" autocomplete="email">
-                <span class="hint">Prototype: inloggen gaat op e-mailadres, zonder wachtwoord.</span>
                 <p class="fout" role="alert"></p>
               </div>
+              <div class="veld">
+                <label for="login-wachtwoord">Je wachtwoord</label>
+                <input type="password" id="login-wachtwoord" autocomplete="current-password">
+                <p class="fout" role="alert"></p>
+              </div>
+              <p class="fout" id="login-melding" role="alert"></p>
               <button type="submit" class="btn btn-primair">Inloggen</button>
+              <p class="klein grijs" style="margin: 16px 0 0;"><a href="wachtwoord-vergeten.html">Wachtwoord vergeten?</a></p>
             </form>
           </div>
 
           <aside class="login-aside" id="maken">
             <h2>Nog geen account?</h2>
+            <p class="klein grijs">Je account ontstaat bij je eerste betaling — kopen of verkopen, dat bepaal jij. Later de andere rol erbij? Dan houd je dezelfde inlog.</p>
             <div class="login-keuze">
               <div class="login-keuze-kaart">
                 <span class="label">Ik zoek een pand</span>
@@ -69,7 +78,7 @@
               </div>
               <div class="login-keuze-kaart">
                 <span class="label">Ik wil verkopen</span>
-                <p class="klein grijs">Maak een verkopersaccount bij het plaatsen van je pand. <span class="tnum">€ 895</span> per plaatsing van 6 maanden.</p>
+                <p class="klein grijs">Je verkopersaccount ontstaat bij het plaatsen van je pand. <span class="tnum">€ 895</span> per plaatsing van 6 maanden.</p>
                 <a class="btn btn-secundair" href="plaatsen.html">Plaats je pand</a>
               </div>
             </div>
@@ -84,7 +93,7 @@
     <div class="container">
       <div class="footer-onder">
         <span>© 2026 Panvia · Gemaakt &amp; beheerd door <a href="https://kaelo-consulting.com" target="_blank" rel="noopener">Kaelo Consulting</a></span>
-        <span>Panvia is geen makelaar.</span>
+        <span>Panvia is geen makelaar. · <a href="cookies.html">Cookies</a></span>
       </div>
     </div>
   </footer>

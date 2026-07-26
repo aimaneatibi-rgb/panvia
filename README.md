@@ -30,7 +30,14 @@ Open de URL die serve toont (meestal http://localhost:3000).
 | `index.html` | Homepage: hero, propositie, rekenmachine courtage vs Panvia, prijsblok (€ 895 per 6 maanden), 3 stappen, uitgelicht aanbod, kopersargument |
 | `aanbod.html` | Aanbodoverzicht met werkende filters (type, plaats, prijs, oppervlakte) |
 | `pand.html` | Detailpagina; laadt een pand via `?id=` (bv. `pand.html?id=w2`), met galerij, kenmerkentabel en contactblok met de eigenaar |
-| `plaatsen.html` | Meerstaps plaatsingsflow: verkopersaccount + eigenaarsverklaring → adres → type & kenmerken → foto's → prijs → betalen |
+| `plaatsen.html` | Plaatsingsflow in drie stappen: (1) account + eigenaarsverklaring, (2) je pand — adres, kenmerken, prijs en foto's op één scherm, (3) controleren & betalen |
+| `kopers.html` | Kopersabonnement (€ 12,95 p/m): account + betalen op één scherm |
+| `inloggen.html` | Inloggen met e-mailadres en wachtwoord; toont je rollen als je al bent ingelogd |
+| `wachtwoord-vergeten.html` / `wachtwoord-resetten.html` | Wachtwoord opnieuw instellen via een eenmalige link (een uur geldig) |
+| `betaald.html` | Terugkeerpagina van Mollie: verifieert de betaling server-side en logt je meteen in |
+| `api/auth/*` | Inloggen, uitloggen, "wie ben ik", wachtwoord vergeten/resetten (Vercel serverless, dependency-vrij) |
+| `api/mollie/*` | Betaling aanmaken, webhook, statuscontrole en een health-endpoint voor zelf-diagnose |
+| `supabase-schema.sql` | Het complete databaseschema (betalingen, accounts met rollen, sessies, wachtwoord-resets) — idempotent, migreert ook een bestaande installatie |
 | `spelregels.html` | De spelregels: alleen eigenaren, geen makelaars of dienstenpromotie, boete € 10.000 per overtreding |
 | `over.html` | Over ons: waar we voor staan, missie & visie (eigenaarschap, onafhankelijkheid), wat we bewust niet doen (o.a. geen hypotheken) |
 | `projecten.html` | Panvia Projecten: pakketten voor parken, complexen en ontwikkelaars vanaf 10 eenheden (€ 5.950 / € 9.950 / € 14.950 per 12 mnd) met aanmeldformulier |
@@ -45,22 +52,24 @@ Open de URL die serve toont (meestal http://localhost:3000).
 
 - **Filteren** op aanbod en zakelijk: type, plaats, prijs, oppervlakte en (zakelijk) BAR filteren de kaarten client-side, met resultaatteller en lege-staat.
 - **Detailpagina's**: elke kaart linkt naar `pand.html?id=…`; prijs, kenmerkentabel, kadastrale info en omschrijving komen uit `data.js`. Galerij met wisselbare beelden (incl. plattegrond).
-- **Plaatsingsflow**: vijf stappen met stap-indicator, per stap validatie met foutmeldingen in gewone taal (bv. postcodecheck), terugnavigeren zonder verlies van invoer, live prijs-preview met courtagevergelijking, en een overzicht vóór het betalen.
+- **Accounts en inloggen** (echt): één account per e-mailadres met rollen — koper (€ 12,95 p/m) en verkoper (€ 895 per plaatsing). Wie eerst koopt en later verkoopt, houdt dezelfde inlog. Wachtwoorden staan als scrypt-hash in Supabase; de sessie is een HttpOnly-cookie waarvan alleen de SHA-256 in de database staat. Na acht mislukte inlogpogingen gaat het account vijftien minuten op slot. Wachtwoord vergeten loopt via een eenmalige link van een uur, en het antwoord is altijd hetzelfde — of het adres nu bekend is of niet.
+- **Betalen dan account**: het account ontstaat pas nadat Mollie de betaling bevestigt (via de webhook, niet via de browser). Bij terugkeer verifieert `betaald.html` de status server-side en logt je meteen in — eenmalig per betaalreferentie.
+- **Plaatsingsflow**: drie stappen met stap-indicator, validatie met foutmeldingen in gewone taal (bv. postcodecheck), terugnavigeren zonder verlies van invoer, live prijs-preview met courtagevergelijking, en een overzicht vóór het betalen. Ben je al ingelogd, dan vervallen naam, e-mail en wachtwoord.
 - **Fotostap**: gekozen bestanden worden echt als voorbeeld getoond (lokaal, via `URL.createObjectURL` — er wordt niets geüpload).
 - **Responsive** tot 375px, toetsenbord-navigeerbaar, focus-stijlen in Inkt, `aria-live` op tellers en meldingen.
 
 ## Wat gesimuleerd is
 
-- **Betalen**: de knop "Betaal € 895" schrijft niets af en publiceert niets — je ziet een bevestigingsscherm met een prototype-melding. Tarief verkoper: € 895 per plaatsing van 6 maanden.
-- **Kopersabonnement**: praten, bieden en de volledige verkoperinformatie zien vereist een kopersabonnement van € 12,95 per maand (maandelijks opzegbaar, gesimuleerd — er wordt niets afgeschreven). Het account wordt bewaard in localStorage (`panvia-koper`). Zonder abonnement zie je alleen de advertentie (foto's, vraagprijs, beschrijving, kenmerken): de chat staat dicht en biedingen zijn onzichtbaar. De verkooppagina staat op `kopers.html`.
+- **Op localhost**: daar draait geen backend, dus betalen én inloggen vallen terug op een simulatie in localStorage (`panvia-account`). Op een deploy gaat alles echt. Instelbaar via `js/config.js` → `betaalModus`.
+- **Kopersabonnement — de gate zelf is echt**: praten, bieden en de volledige verkoperinformatie zien vereist een betaald kopersabonnement van € 12,95 per maand. De rol komt van de server, niet uit de browser. Zonder abonnement zie je alleen de advertentie (foto's, vraagprijs, beschrijving, kenmerken): de chat staat dicht en biedingen zijn onzichtbaar. De verkooppagina staat op `kopers.html`.
 - **Projecten**: drie demoprojecten (appartementencomplex, vakantiepark, bedrijfsverzamelgebouw) verschijnen elk in het aanbod van hun eigen categorie — filter op woning, vakantie of commercieel en het bijbehorende project komt bovenaan. Belangstelling registreren is gratis en zonder account; dat is het product dat de ontwikkelaar afneemt.
-- **Verkopersaccount**: plaatsen begint met een account (localStorage `panvia-verkoper`) plus een verplichte eigenaarsverklaring: geen makelaar, geen dienstenpromotie, akkoord met de spelregels incl. boete van € 10.000 per overtreding.
+- **Verkopersaccount**: plaatsen begint met een account plus een verplichte eigenaarsverklaring: geen makelaar, geen dienstenpromotie, akkoord met de spelregels incl. boete van € 10.000 per overtreding. De verkopersrol wordt pas actief ná de betaling; "Mijn Panvia" blijft tot die tijd dicht.
 - **Chat met de eigenaar**: na je eerste bericht opent een chatgesprek (à la Marktplaats) met snelstart-vragen. De eigenaar is gesimuleerd; het gesprek wordt per pand bewaard in localStorage en overleeft een herlaad. Er wordt niets verstuurd.
 - **Bieden**: in de chat (of direct bij het eerste bericht) kun je een bod doen; het verschijnt als gestructureerd bod-bericht, nadrukkelijk niet bindend. Panvia bemiddelt niet.
 - **Eigenaarskant** (`eigenaar.html`, "Mijn Panvia"): inbox met alle gesprekken en biedingen op het demopand (Meidoornlaan 14), inclusief twee gezaaide voorbeeldgesprekken. De eigenaar kan zelf antwoorden; antwoorden verschijnen ook aan de koperszijde op `pand.html?id=w2`.
 - **Het aanbod**: alle 16 panden zijn verzonnen. Adressen, prijzen, BAR's en kijkcijfers zijn fictief.
 - **Beelden**: de exterieurfoto's (`img/*.webp`, één per pand) zijn AI-gegenereerde voorbeeldbeelden — het zijn geen bestaande panden. De overige galerijbeelden zijn getekende SVG-silhouetten en de plattegrond is een blauwdruk in Ultramarijn. Bewust géén stockfoto's van mensen, sleutels of handdrukken (brandbook §12).
-- Er is geen backend, geen opslag, geen account.
+- **Wat níét gesimuleerd is**: betalingen (Mollie), accounts, rollen, sessies en wachtwoorden. Die draaien op Vercel serverless + Supabase. Zie `supabase-schema.sql` en `/api/mollie/health` voor zelf-diagnose.
 
 ## Merkregels die in de code zijn afgedwongen (huisstijl v2 "Blauwdruk")
 

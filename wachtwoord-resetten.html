@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Je betaling | Panvia</title>
-  <meta name="description" content="Bevestiging van je betaling bij Panvia.">
+  <title>Nieuw wachtwoord instellen | Panvia</title>
+  <meta name="description" content="Kies een nieuw wachtwoord voor je Panvia-account.">
   <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#2438D8">
   <script src="js/consent.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232438D8'/%3E%3Cpath d='M14 32 L32 17 L50 32 L50 49 A3 3 0 0 1 47 52 L38 52 L38 41 A3 3 0 0 0 35 38 L29 38 A3 3 0 0 0 26 41 L26 52 L17 52 A3 3 0 0 1 14 49 Z' fill='none' stroke='%23FFFFFF' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/panvia.css">
 </head>
-<body data-page="betaald">
+<body data-page="wachtwoord-resetten">
   <a class="skip-link" href="#inhoud">Ga direct naar de inhoud</a>
 
   <header class="site-header">
@@ -41,13 +42,28 @@
   <main id="inhoud">
     <section class="sectie-krap">
       <div class="container">
-        <div class="formulier-paneel" id="betaald-blok" style="max-width: 640px;">
-          <!-- Wordt gevuld door initBetaald() in js/panvia.js:
-               verwerken → betaald / mislukt / geannuleerd / verlopen -->
-          <div class="mollie-verwerkt">
-            <div class="mollie-spinner" aria-hidden="true"></div>
-            <p role="status">We controleren je betaling…</p>
-          </div>
+        <div class="sectie-kop" style="margin-bottom: 32px;">
+          <span class="kop-label">Account</span>
+          <h1>Kies een nieuw wachtwoord</h1>
+          <p class="body-l">Zodra je het opslaat, ben je meteen ingelogd. Alle andere apparaten worden uitgelogd.</p>
+        </div>
+
+        <div class="formulier-paneel" id="resetten-blok" style="max-width: 560px;">
+          <form id="resetten-form" novalidate>
+            <div class="veld">
+              <label for="reset-wachtwoord">Nieuw wachtwoord</label>
+              <input type="password" id="reset-wachtwoord" autocomplete="new-password" minlength="8">
+              <span class="hint">Minstens 8 tekens.</span>
+              <p class="fout" role="alert"></p>
+            </div>
+            <div class="veld">
+              <label for="reset-herhaal">Herhaal het wachtwoord</label>
+              <input type="password" id="reset-herhaal" autocomplete="new-password">
+              <p class="fout" role="alert"></p>
+            </div>
+            <p class="fout" id="reset-melding" role="alert"></p>
+            <button type="submit" class="btn btn-primair">Opslaan en inloggen</button>
+          </form>
         </div>
       </div>
     </section>

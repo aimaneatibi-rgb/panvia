@@ -51,8 +51,25 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://panvia.nl/cookies.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
     <loc>https://panvia.nl/eigenaar.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://panvia.nl/gidsen.html</loc>
+    <lastmod>2026-07-27</lastmod>
+  </url>
+  <url>
+    <loc>https://panvia.nl/gids.html</loc>
+    <lastmod>2026-07-27</lastmod>
+  </url>
+  <url>
+    <loc>https://panvia.nl/contact.html</loc>
+    <lastmod>2026-07-27</lastmod>
   </url>
 </urlset>

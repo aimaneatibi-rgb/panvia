@@ -1,24 +1,28 @@
 /* ==========================================================================
    PANVIA — panvia.css
-   Eén prijs. Geen tussenpersoon.
-   Huisstijl v2 "Blauwdruk" — bron van waarheid: 01 Brandbook.md, wijk niet af.
+   Vastgoed in eigen hand.
+   Huisstijl v3 "Open Huis" — bron van waarheid: 01 Brandbook.md, wijk niet af.
+   CONCEPT (website-v3): tokens omgezet + v3-laag onderaan (§16).
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Design tokens (Brandbook §9, §10, §11)
+   1. Design tokens (Brandbook v3 §5, §6, §7)
    -------------------------------------------------------------------------- */
 :root {
-  /* Kleur */
-  --nacht: #0E1230;            /* tekst, koppen, footer */
-  --ultramarijn: #2438D8;      /* merk én actie */
+  /* Kleur — gemeten uit het socialpack */
+  --nacht: #0B1030;            /* tekst, koppen, footer */
+  --ultramarijn: #2438D8;      /* Panvia-blauw: merk én actie */
   --ultramarijn-hover: #1B2BAE;
-  --papier: #F2F0E9;           /* paginabasis */
-  --lucht: #E9EDFA;            /* lichte Ultramarijn-tint: accentvlakken */
+  --blauw-diep: #101854;       /* ondereinde van blauwe verlopen */
+  --papier: #F7F8FF;           /* paginabasis: IJs */
+  --lucht: #E9EDFF;            /* lichte blauwtint: accentvlakken, pillen */
   --lucht-lijn: #D5DCF4;       /* randen op Lucht */
   --wit: #FFFFFF;              /* kaarten, panelen */
-  --staal: #575E7B;            /* secundaire tekst */
-  --krijt: #E3E0D5;            /* haarlijnen, randen */
-  --zegel: #0F8A5C;            /* uitsluitend: bevestiging, "beschikbaar" */
+  --staal: #666E85;            /* secundaire tekst: Leisteen */
+  --krijt: #E4E7F2;            /* zachte randen */
+  --zegel: #10C292;            /* Munt: bevestiging, "beschikbaar", tips */
+  --vlam: #FF6A3D;             /* warm accent: mijlpalen */
+  --zon: #E8C24B;              /* CTA op donker — altijd met Nacht-tekst */
   --amber: #B45309;            /* alleen functioneel: waarschuwing */
   --rood: #C0261D;             /* alleen fouten */
 
@@ -26,22 +30,25 @@
   --nacht-tekst: #C7CBE0;      /* lopende tekst op Nacht */
   --nacht-lijn: rgba(199, 203, 224, .25);
 
-  /* Het raster: millimeterpapier van de tekentafel — bijna onzichtbaar */
-  --raster: rgba(36, 56, 216, .05);
-  --raster-nacht: rgba(233, 237, 250, .05);
+  /* v2-raster: uitgezet in v3 (Open Huis heeft geen millimeterpapier) */
+  --raster: transparent;
+  --raster-nacht: transparent;
 
   /* Spacing-schaal: 4/8/12/16/24/32/48/64/96 — niets daarbuiten */
   --s-4: 4px;  --s-8: 8px;  --s-12: 12px; --s-16: 16px;
   --s-24: 24px; --s-32: 32px; --s-48: 48px; --s-64: 64px; --s-96: 96px;
 
-  /* Vorm: scherp, technisch — haarlijnen doen het werk, geen schaduwen */
-  --radius: 2px;
-  --radius-kaart: 4px;
+  /* Vorm: rond en zacht — pillen, kaarten met schaduw */
+  --radius: 12px;
+  --radius-kaart: 20px;
+  --radius-pil: 999px;
+  --schaduw: 0 4px 16px rgba(11, 16, 48, .08);
+  --schaduw-zweef: 0 10px 28px rgba(11, 16, 48, .14);
 
-  /* Typografie */
-  --font-kop: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-tekst: "Instrument Sans", -apple-system, "Segoe UI", sans-serif;
-  --font-data: "IBM Plex Mono", "Consolas", monospace;
+  /* Typografie: Poppins draagt het merk, Inter doet het leeswerk */
+  --font-kop: "Poppins", -apple-system, "Segoe UI", sans-serif;
+  --font-tekst: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-data: "Poppins", -apple-system, "Segoe UI", sans-serif;
 
   --breedte-content: 1200px;
 }
@@ -50,6 +57,10 @@
    2. Basis
    -------------------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
+
+/* hidden moet altijd winnen. Zonder dit blijft een element met een eigen
+   display (grid, flex) gewoon staan als de JS het op hidden zet. */
+[hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
 
@@ -461,6 +472,7 @@ p { margin: 0 0 var(--s-16); }
 .veld input[type="text"],
 .veld input[type="email"],
 .veld input[type="tel"],
+.veld input[type="password"],
 .veld input[type="number"],
 .veld select,
 .veld textarea {
@@ -1000,6 +1012,61 @@ legend {
   border-top: 1px solid var(--krijt);
 }
 .stap[hidden] { display: none; }
+
+/* Veldgroep — meerdere onderwerpen op één stap uit elkaar houden zonder er
+   losse schermen van te maken. Scheidslijn boven, legenda als kopje. */
+.veldgroep {
+  margin: 0 0 var(--s-32);
+  padding-top: var(--s-24);
+  border-top: 1px solid var(--krijt);
+}
+.veldgroep:first-of-type { padding-top: 0; border-top: 0; }
+.veldgroep > legend {
+  font-family: var(--font-kop);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--nacht);
+  margin-bottom: var(--s-16);
+}
+.veldgroep .stap-intro { margin-bottom: var(--s-24); font-size: 15px; }
+.veldgroep .radio-rij { margin-bottom: var(--s-24); }
+
+/* Twee korte velden naast elkaar; onder elkaar zodra het krap wordt. */
+.veld-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-24);
+}
+.veld-rij > .veld { flex: 1 1 200px; min-width: 0; }
+
+/* "Je bent ingelogd als …" boven een aanmeldformulier. */
+.ingelogd-blok {
+  border: 1px solid var(--krijt);
+  border-left: 3px solid var(--zegel);
+  border-radius: var(--radius);
+  background: var(--papier);
+  padding: var(--s-16) var(--s-24);
+  margin-bottom: var(--s-32);
+}
+.ingelogd-blok .label { display: block; margin-bottom: var(--s-4); }
+.ingelogd-blok p { margin: 0; }
+.ingelogd-naam {
+  font-weight: 500;
+  color: var(--nacht);
+  margin-bottom: var(--s-4) !important;
+}
+
+/* Knop die als tekstlink oogt — voor kleine acties in lopende tekst. */
+.knop-als-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--ultramarijn);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.knop-als-link:hover { text-decoration: none; }
 
 .foto-lijst { list-style: none; margin: var(--s-16) 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--s-12); }
 .foto-lijst li { border: 1px solid var(--krijt); border-radius: var(--radius); overflow: hidden; background: var(--papier); }
@@ -1823,3 +1890,594 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
   .kaarten-grid { grid-template-columns: 1fr; }
   .container { padding-left: var(--s-16); padding-right: var(--s-16); }
 }
+
+/* ==========================================================================
+   16. V3 "OPEN HUIS" — overridelaag (concept website-v3)
+   Alles hieronder wint van de v2-regels hierboven. Bij akkoord kan deze
+   laag met de secties erboven worden samengevoegd.
+   ========================================================================== */
+
+/* ---- Logo: het open huisje -------------------------------------------- */
+.merk::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 30 L32 10 L56 30 L56 54 A4 4 0 0 1 52 58 L40 58 L40 42 A4 4 0 0 0 36 38 L28 38 A4 4 0 0 0 24 42 L24 58 L12 58 A4 4 0 0 1 8 54 Z' fill='none' stroke='%232438D8' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.footer-merk::before, .sectie-nacht .merk::before, .hero-nacht .merk::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 30 L32 10 L56 30 L56 54 A4 4 0 0 1 52 58 L40 58 L40 42 A4 4 0 0 0 36 38 L28 38 A4 4 0 0 0 24 42 L24 58 L12 58 A4 4 0 0 1 8 54 Z' fill='none' stroke='%23FFFFFF' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.woordmerk { font-weight: 600; }
+.merk-tagline { text-transform: none; letter-spacing: 0.01em; font-size: 11px; font-family: var(--font-tekst); }
+
+/* ---- Koppen: Poppins, stevig, geen kunst-cursief ------------------------ */
+.display, h1 { font-weight: 700; letter-spacing: -0.015em; }
+.display em, h1 em { font-style: normal; color: var(--zon); }
+.hero:not(.hero-nacht) .display em, .hero:not(.hero-nacht) h1 em { color: var(--ultramarijn); }
+
+/* ---- Labels & eyebrows: van mono-stempel naar pil ----------------------- */
+.kop-label {
+  display: inline-block;
+  background: var(--lucht);
+  color: var(--ultramarijn);
+  border-radius: var(--radius-pil);
+  padding: 6px 16px;
+  font-family: var(--font-kop);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.sectie-nacht .kop-label, .hero-nacht .kop-label {
+  background: rgba(255, 255, 255, .14);
+  color: var(--wit);
+}
+.label {
+  font-family: var(--font-kop);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+.hero-microproof { font-family: var(--font-tekst); text-transform: none; letter-spacing: 0.01em; font-size: 13px; }
+
+/* ---- Knoppen: pillen ---------------------------------------------------- */
+.btn {
+  border-radius: var(--radius-pil);
+  font-family: var(--font-kop);
+  font-weight: 600;
+  min-height: 48px;
+  padding: 0 var(--s-32);
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.btn-primair:hover { transform: translateY(-1px); box-shadow: var(--schaduw); }
+.btn-secundair { border: 1.5px solid var(--ultramarijn); color: var(--ultramarijn); background: var(--wit); }
+.btn-secundair:hover { background: var(--lucht); color: var(--ultramarijn); }
+.sectie-nacht .btn-primair, .hero-nacht .btn-primair {
+  background: var(--zon);
+  border-color: var(--zon);
+  color: var(--nacht); /* Zon-knop: altijd Nacht-tekst */
+}
+.sectie-nacht .btn-primair:hover, .hero-nacht .btn-primair:hover { background: #f2d066; border-color: #f2d066; color: var(--nacht); }
+.site-nav .nav-cta { border-radius: var(--radius-pil); padding: 10px var(--s-24); font-family: var(--font-kop); font-weight: 600; }
+.nav-toggle { border-radius: var(--radius-pil); }
+
+/* ---- Kaarten: rond, zacht, zwevend -------------------------------------- */
+.pandkaart {
+  border-color: transparent;
+  box-shadow: var(--schaduw);
+  border-radius: var(--radius-kaart);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.pandkaart:hover { border-color: transparent; box-shadow: var(--schaduw-zweef); transform: translateY(-3px); }
+.pandkaart-foto { border-bottom: 0; }
+.pandkaart-body { padding: var(--s-16) var(--s-24) var(--s-24); }
+.pandkaart-prijs { font-weight: 700; font-size: 22px; }
+.pandkaart-meta { font-family: var(--font-tekst); }
+.pandkaart-footer {
+  border-top: 0;
+  padding-top: 0;
+}
+.pandkaart-footer, .pandkaart-footer * {
+  font-family: var(--font-kop);
+}
+.pandkaart-footer {
+  display: inline-block;
+  background: #E7F8F2;
+  color: #0B8F6C;
+  border-radius: var(--radius-pil);
+  padding: 5px 14px;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 600;
+}
+
+/* ---- Tags: stempel wordt pil -------------------------------------------- */
+.tag {
+  border-radius: var(--radius-pil);
+  border-color: transparent;
+  background: var(--lucht);
+  font-family: var(--font-kop);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  padding: 4px var(--s-12);
+}
+
+/* ---- Hero: warm, zonder tekentafel-frame -------------------------------- */
+.hero { background-image: none; }
+#hero-kaart::before { display: none; }
+#hero-kaart .pandkaart { box-shadow: var(--schaduw-zweef); }
+
+/* ---- Donkere secties: blauwverloop i.p.v. raster-Nacht ------------------- */
+.sectie-nacht {
+  background: linear-gradient(165deg, var(--ultramarijn) 0%, var(--blauw-diep) 100%);
+}
+.hero-nacht {
+  background: linear-gradient(165deg, var(--ultramarijn) 0%, var(--blauw-diep) 100%);
+}
+.sectie-nacht p, .hero-nacht p.body-l { color: rgba(255, 255, 255, .82); }
+.sectie-nacht a { color: var(--wit); }
+
+/* ---- Prijsblok: kaart met schaduw, prijs in vette Poppins ---------------- */
+.prijsblok {
+  border: 0;
+  border-top: 0;
+  border-radius: 24px;
+  box-shadow: var(--schaduw);
+}
+.prijsblok-bedrag { font-weight: 700; letter-spacing: -0.01em; }
+.reken-kaart { border: 0; border-radius: 24px; box-shadow: var(--schaduw); }
+.reken-bedrag { font-weight: 700; }
+
+/* ---- Footer blijft Nacht ------------------------------------------------- */
+.site-footer { background: var(--nacht); }
+
+/* ---- Statsstrip: zachte band zonder raster ------------------------------- */
+.statsstrip { background-image: none; border-top: 0; border-bottom: 0; }
+.stat-getal { font-weight: 700; }
+
+/* ==========================================================================
+   17. V3 UX-laag — Zillow-patronen: zoeken, bewaren, sorteren, sticky
+   ========================================================================== */
+
+/* ---- Hero-zoekbalk: de voordeur van het aanbod --------------------------- */
+.hero-zoek {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+  background: var(--wit);
+  border-radius: var(--radius-pil);
+  box-shadow: var(--schaduw);
+  padding: 6px 6px 6px var(--s-16);
+  margin-top: var(--s-24);
+  max-width: 560px;
+}
+.hero-zoek:focus-within { box-shadow: var(--schaduw-zweef), 0 0 0 2px var(--ultramarijn); }
+.hero-zoek-icoon { width: 22px; height: 22px; color: var(--staal); flex: none; }
+.hero-zoek input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: 16px/1.4 var(--font-tekst);
+  color: var(--nacht);
+  padding: var(--s-12) var(--s-8);
+}
+.hero-zoek input:focus { outline: none; }
+.hero-zoek input::placeholder { color: var(--staal); }
+.hero-zoek .btn { min-height: 44px; padding: 0 var(--s-24); flex: none; }
+.hero-zoek .btn::after { content: none; }
+
+/* ---- Hart op de pandkaart ------------------------------------------------ */
+.pandkaart-foto { position: relative; }
+.kaart-hart {
+  position: absolute;
+  top: var(--s-12);
+  right: var(--s-12);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--schaduw);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--nacht);
+  padding: 0;
+  transition: transform .15s ease, color .15s ease;
+}
+.kaart-hart svg { width: 20px; height: 20px; display: block; }
+.kaart-hart:hover { transform: scale(1.08); color: var(--vlam); }
+.kaart-hart.aan { color: var(--vlam); }
+.kaart-hart.aan svg path { fill: var(--vlam); stroke: var(--vlam); }
+
+/* Hart op de detailpagina: in de prijsregel, niet zwevend */
+.kaart-hart.hart-detail {
+  position: static;
+  vertical-align: middle;
+  margin-left: var(--s-12);
+  background: var(--lucht);
+  box-shadow: none;
+}
+
+/* ---- Resultaatbalk: teller links, bewaard + sorteren rechts -------------- */
+.resultaatbalk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-16);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-16);
+}
+.resultaatbalk .resultaat-teller { margin: 0; }
+.resultaat-acties { display: inline-flex; align-items: center; gap: var(--s-12); }
+.sorteer-label { font-size: 13px; color: var(--staal); }
+#sorteer {
+  border: 1.5px solid var(--krijt);
+  border-radius: var(--radius-pil);
+  background: var(--wit);
+  font: 600 13px/1.4 var(--font-kop);
+  color: var(--nacht);
+  padding: 8px var(--s-16);
+  cursor: pointer;
+}
+
+/* ---- Chip: "Bewaard (n)" ------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--krijt);
+  border-radius: var(--radius-pil);
+  background: var(--wit);
+  font: 600 13px/1.4 var(--font-kop);
+  color: var(--nacht);
+  padding: 8px var(--s-16);
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.chip svg { width: 16px; height: 16px; }
+.chip:hover { border-color: var(--vlam); color: var(--vlam); }
+.chip.aan { background: var(--vlam); border-color: var(--vlam); color: var(--wit); }
+.chip.aan svg path { fill: currentColor; }
+
+/* Zoekveld in de filterbalk */
+.veld-zoek input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--krijt);
+  border-radius: var(--radius);
+  background: var(--wit);
+  font: 15px/1.4 var(--font-tekst);
+  color: var(--nacht);
+  padding: 0 var(--s-12);
+}
+.veld-zoek input:focus { outline: 2px solid var(--ultramarijn); outline-offset: -1px; }
+
+/* ---- Detailpagina: rechterkolom plakt mee (Zillow-paneel) ---------------- */
+@media (min-width: 900px) {
+  .detail-grid > div:last-child {
+    position: sticky;
+    top: 88px;              /* onder de sticky header */
+    align-self: start;
+  }
+}
+
+/* Detailpaneel: geen v2-accentlijn, wel v3-schaduw */
+.detail-paneel { border-top: 0; border-radius: 24px; box-shadow: var(--schaduw); border-color: transparent; }
+.eigenaar-blok { border-radius: 24px; }
+
+/* ==========================================================================
+   18. V3 Zillow-laag — foto-hero, ingangen, kaart-splitview, gidsen
+   ========================================================================== */
+
+/* ---- Hero met foto (homepage) -------------------------------------------- */
+.hero-foto {
+  position: relative;
+  background: var(--nacht);
+  background-image:
+    linear-gradient(180deg, rgba(11, 16, 48, .62) 0%, rgba(11, 16, 48, .38) 55%, rgba(11, 16, 48, .66) 100%),
+    url("../img/hero.jpg");
+  background-size: cover;
+  background-position: center 62%;
+  padding-top: 108px;
+  padding-bottom: 108px;
+  color: var(--wit);
+}
+.hero-foto-inner { max-width: 720px; }
+.hero-foto .display, .hero-foto h1 { color: var(--wit); }
+.hero-foto .display em { color: var(--zon); }
+.hero-foto p.body-l { color: rgba(255, 255, 255, .88); max-width: 56ch; }
+.hero-foto .hero-eyebrow { color: rgba(255, 255, 255, .85); }
+.hero-foto .hero-microproof { color: rgba(255, 255, 255, .72); }
+.hero-foto .hero-zoek { max-width: 620px; box-shadow: 0 12px 32px rgba(11, 16, 48, .35); }
+.btn-hero-licht { background: transparent; border-color: rgba(255, 255, 255, .75); color: var(--wit); }
+.btn-hero-licht:hover { background: rgba(255, 255, 255, .14); border-color: var(--wit); color: var(--wit); }
+.hero-foto .countdown { color: var(--wit); }
+
+/* ---- Drie ingangen (Zillow-kaarten) -------------------------------------- */
+.ingang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-24);
+}
+.ingang {
+  display: flex;
+  flex-direction: column;
+  background: var(--wit);
+  border-radius: var(--radius-kaart);
+  box-shadow: var(--schaduw);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.ingang:hover { box-shadow: var(--schaduw-zweef); transform: translateY(-3px); color: inherit; }
+.ingang-foto { aspect-ratio: 16 / 9; overflow: hidden; }
+.ingang-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.ingang:hover .ingang-foto img { transform: scale(1.04); }
+.ingang-body { padding: var(--s-24); display: flex; flex-direction: column; gap: var(--s-8); flex: 1; }
+.ingang-body h3 { margin: 0; }
+.ingang-body p { color: var(--staal); font-size: 15px; margin: 0; flex: 1; }
+.ingang-body .btn { align-self: flex-start; margin-top: var(--s-8); }
+@media (max-width: 860px) { .ingang-grid { grid-template-columns: 1fr; } }
+
+/* ---- Kaart-splitview op het aanbod --------------------------------------- */
+.aanbod-splits {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--s-24);
+  align-items: start;
+}
+.aanbod-kaartkolom {
+  position: sticky;
+  top: 84px;
+  height: calc(100vh - 108px);
+  min-height: 420px;
+}
+#aanbod-kaart {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-kaart);
+  overflow: hidden;
+  box-shadow: var(--schaduw);
+  background: var(--lucht);
+}
+.aanbod-lijstkolom { min-width: 0; }
+.aanbod-lijstkolom .kaarten-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.chip-kaart { display: none; }
+@media (max-width: 899px) {
+  .aanbod-splits { display: block; }
+  .chip-kaart { display: inline-flex; }
+  .aanbod-kaartkolom {
+    display: none;
+    position: static;
+    height: 380px;
+    margin-bottom: var(--s-24);
+  }
+  .aanbod-splits.toon-kaart .aanbod-kaartkolom { display: block; }
+}
+
+/* Prijs-pillen als kaartmarkers */
+.prijs-pin-wrap { background: none; border: 0; }
+.prijs-pin {
+  display: inline-block;
+  transform: translate(-50%, -100%);
+  background: var(--wit);
+  color: var(--ultramarijn);
+  font: 700 12px/1 var(--font-kop);
+  padding: 6px 10px;
+  border-radius: var(--radius-pil);
+  border: 1.5px solid var(--lucht-lijn);
+  box-shadow: 0 3px 10px rgba(11, 16, 48, .22);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .12s ease, background-color .12s ease, color .12s ease;
+}
+.prijs-pin:hover { background: var(--ultramarijn); color: var(--wit); transform: translate(-50%, -100%) scale(1.06); }
+.prijs-pin.pin-project { background: var(--ultramarijn); color: var(--wit); border-color: var(--ultramarijn); }
+
+/* Popup op de kaart: mini-pandkaart */
+.leaflet-popup-content-wrapper { border-radius: 16px; box-shadow: var(--schaduw-zweef); }
+.leaflet-popup-content { margin: 0; width: 220px; }
+.kaart-popup { display: block; text-decoration: none; color: inherit; overflow: hidden; border-radius: 16px; }
+.kaart-popup img { width: 100%; height: 120px; object-fit: cover; display: block; }
+.kaart-popup-prijs { display: block; font: 700 17px/1.2 var(--font-kop); color: var(--ultramarijn); padding: 10px 14px 0; }
+.kaart-popup-adres { display: block; font: 500 14px/1.3 var(--font-tekst); color: var(--nacht); padding: 2px 14px 0; }
+.kaart-popup-plaats { display: block; font: 400 13px/1.3 var(--font-tekst); color: var(--staal); padding: 0 14px 12px; }
+.leaflet-container { font-family: var(--font-tekst); }
+
+/* ---- Gidsen -------------------------------------------------------------- */
+.gidsen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-24);
+}
+.gidsen-grid.gidsen-groot { grid-template-columns: repeat(2, 1fr); }
+.gids-kaart {
+  display: flex;
+  flex-direction: column;
+  background: var(--wit);
+  border-radius: var(--radius-kaart);
+  box-shadow: var(--schaduw);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.gids-kaart:hover { box-shadow: var(--schaduw-zweef); transform: translateY(-3px); color: inherit; }
+.gids-foto { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+.gids-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.gids-kaart:hover .gids-foto img { transform: scale(1.04); }
+.gids-badge {
+  position: absolute;
+  left: var(--s-12);
+  top: var(--s-12);
+  background: rgba(255, 255, 255, .94);
+  color: var(--nacht);
+  font: 600 12px/1 var(--font-kop);
+  padding: 6px 12px;
+  border-radius: var(--radius-pil);
+  box-shadow: var(--schaduw);
+}
+.gids-body { padding: var(--s-24); display: flex; flex-direction: column; gap: var(--s-8); flex: 1; }
+.gids-body h3 { margin: 0; font-size: 19px; }
+.gids-body p { color: var(--staal); font-size: 14.5px; margin: 0; flex: 1; }
+.gids-lees { color: var(--ultramarijn); font: 600 14px/1 var(--font-kop); }
+@media (max-width: 860px) {
+  .gidsen-grid, .gidsen-grid.gidsen-groot { grid-template-columns: 1fr; }
+}
+
+/* Gids-artikel */
+.gids-artikel { max-width: 760px; }
+.gids-hero { position: relative; border-radius: var(--radius-kaart); overflow: hidden; margin: var(--s-24) 0 var(--s-32); box-shadow: var(--schaduw); }
+.gids-hero img { width: 100%; height: 320px; object-fit: cover; display: block; }
+.gids-artikel h1 { margin-top: var(--s-16); }
+.gids-sectie { margin-top: var(--s-32); }
+.gids-sectie h2 { font-size: 22px; }
+.gids-sectie p { color: #3A4160; line-height: 1.7; }
+
+/* Accentwoord in de foto-hero: Zon — wint van de §16-regel voor lichte hero's */
+.hero.hero-foto .display em, .hero.hero-foto h1 em { color: var(--zon); }
+
+/* ==========================================================================
+   19. V3 inbox-splitview — gesprekkenlijst links, gesprek rechts (Zillow)
+   ========================================================================== */
+.inbox-splits { margin-top: var(--s-24); }
+.inbox-rij {
+  border-radius: 16px;
+  border: 1.5px solid transparent;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.inbox-rij.actief {
+  border-color: var(--ultramarijn);
+  background: var(--lucht);
+}
+#inbox-gesprek .chat {
+  background: var(--wit);
+  border-radius: var(--radius-kaart);
+  box-shadow: var(--schaduw);
+  padding: var(--s-24);
+}
+@media (min-width: 900px) {
+  .inbox-splits {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-24);
+    align-items: start;
+  }
+  #inbox-lijst { margin-top: 0; max-width: none; }
+  #inbox-gesprek { position: sticky; top: 88px; }
+  #inbox-gesprek #inbox-terug { display: none; } /* teruglink is een mobiel ding */
+}
+
+/* ==========================================================================
+   20. V3 berichten-zijpaneel — inbox altijd aan de zijkant + contactpagina
+   ========================================================================== */
+#berichten-tab {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--ultramarijn);
+  color: var(--wit);
+  border: 0;
+  border-radius: 14px 0 0 14px;
+  padding: 16px 10px;
+  cursor: pointer;
+  box-shadow: -4px 6px 18px rgba(11, 16, 48, .22);
+  font: 600 13px/1 var(--font-kop);
+  transition: background-color .15s ease, right .25s ease;
+}
+#berichten-tab span:not(.berichten-teller) { writing-mode: vertical-rl; letter-spacing: .04em; }
+#berichten-tab svg { width: 20px; height: 20px; }
+#berichten-tab:hover { background: var(--ultramarijn-hover); }
+#berichten-tab .berichten-teller {
+  background: var(--zon);
+  color: var(--nacht);
+  border-radius: 999px;
+  min-width: 20px;
+  padding: 3px 5px;
+  font-size: 12px;
+  text-align: center;
+}
+#berichten-tab .berichten-teller:empty { display: none; }
+#berichten-tab.open { right: min(420px, 92vw); }
+
+#berichten-paneel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 92vw);
+  background: var(--wit);
+  z-index: 69;
+  box-shadow: -12px 0 32px rgba(11, 16, 48, .18);
+  transform: translateX(105%);
+  transition: transform .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+#berichten-paneel.open { transform: translateX(0); }
+.bp-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-16) var(--s-24);
+  border-bottom: 1px solid var(--krijt);
+}
+.bp-kop h2 { margin: 0; font-size: 20px; }
+#bp-sluit {
+  border: 0;
+  background: var(--lucht);
+  color: var(--nacht);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+#bp-sluit:hover { background: var(--lucht-lijn); }
+.bp-inhoud {
+  padding: var(--s-16) var(--s-24) var(--s-24);
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.bp-thread { flex: 1; overflow-y: auto; max-height: none; }
+.bp-inhoud .chat-invoer { margin-top: var(--s-12); }
+.bp-gesprek-kop { margin: var(--s-8) 0 var(--s-12); }
+.bp-leeg { text-align: center; padding: var(--s-48) var(--s-16); display: flex; flex-direction: column; gap: var(--s-12); align-items: center; }
+@media (max-width: 600px) {
+  #berichten-tab { padding: 12px 8px; }
+  #berichten-tab.open { right: 92vw; }
+}
+
+/* Contactpagina */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--s-48);
+  align-items: start;
+}
+.contact-uitleg { margin-top: var(--s-32); display: flex; flex-direction: column; gap: var(--s-24); }
+.contact-punt h3 { font-size: 17px; margin-bottom: var(--s-4); }
+.contact-paneel { background: var(--wit); border-radius: 24px; box-shadow: var(--schaduw); padding: var(--s-32); }
+.contact-paneel textarea {
+  width: 100%;
+  border: 1px solid var(--krijt);
+  border-radius: var(--radius);
+  font: 15px/1.5 var(--font-tekst);
+  color: var(--nacht);
+  padding: var(--s-12);
+  resize: vertical;
+}
+.contact-paneel textarea:focus { outline: 2px solid var(--ultramarijn); outline-offset: -1px; }
+@media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr; gap: var(--s-24); } }

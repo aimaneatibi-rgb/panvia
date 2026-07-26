@@ -66,10 +66,10 @@ var PANVIA_CONFIG = {
      "JJJJ-MM-DD" (ISO). Laat leeg ("") om alle datum-/countdownelementen
      te verbergen en terug te vallen op "binnenkort".
      ---------------------------------------------------------------------- */
-  lanceringsDatum: "2026-08-17",
+  lanceringsDatum: "2026-08-10",
 
   /* Menselijke weergave van diezelfde datum (voor koppen en lopende tekst) */
-  lanceringsDatumTekst: "17 augustus 2026",
+  lanceringsDatumTekst: "10 augustus 2026",
 
   /* Publieke basis-URL, gebruikt in sitemap en deelbare links */
   siteUrl: "https://panvia.nl",

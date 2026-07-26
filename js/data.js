@@ -691,5 +691,5 @@ var PANVIA_PROJECTEN = [
 /* Panden uitgelicht op de homepage: woningen, commercieel én een vakantiewoning */
 var PANVIA_UITGELICHT = ["w2", "w1", "v2", "c4", "w7", "c3"];
 
-/* Plaatsingsfee verkoper: € 895 per plaatsing van 6 maanden, incl. btw */
+/* Plaatsingsfee verkoper: € 895 per plaatsing van 6 maanden, excl. btw */
 var PANVIA_FEE = 895;

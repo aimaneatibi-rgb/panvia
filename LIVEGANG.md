@@ -6,6 +6,34 @@ die drie verlies je geld aan advertenties.
 
 ---
 
+## 0. Accounts & inloggen aanzetten — DOE DIT EERST
+
+De onboarding draait sinds deze wijziging op echte accounts. Zonder de twee
+stappen hieronder werkt inloggen niet en blijven nieuwe betalingen hangen.
+
+1. **Database bijwerken.** Supabase Dashboard → SQL Editor → plak de volledige
+   inhoud van `supabase-schema.sql` → Run. Het script is idempotent en migreert
+   een bestaande installatie: accounts krijgen rollen (`koper_actief`,
+   `verkoper_actief`) en een wachtwoordveld, dubbele rijen per e-mailadres
+   worden samengevoegd, en `sessies` + `wachtwoord_resets` komen erbij.
+2. **Controleren.** Open `https://<jouw-domein>/api/mollie/health`. Je wilt
+   `auth.schema: true` zien. Staat er `false`, lees dan `auth.fout` — dan is het
+   script niet (volledig) gedraaid.
+
+**Wachtwoord vergeten heeft mail nodig.** Zonder deze stap krijgt niemand een
+resetlink (de rest werkt wel, en de bezoeker ziet nooit een foutmelding — dat is
+met opzet, zodat het endpoint geen klantenlijst wordt):
+
+- Maak een account op [Resend](https://resend.com), verifieer `panvia.nl` als
+  afzenddomein en maak een API-key.
+- Zet in Vercel → Settings → Environment Variables:
+  `RESEND_API_KEY` = `re_...` en `MAIL_VAN` = `Panvia <hallo@panvia.nl>`.
+- Health-endpoint toont dan `auth.mailKlaar: true`. Test het met je eigen adres.
+
+> Let op: accounts die vóór deze wijziging zijn aangemaakt hebben nog geen
+> wachtwoord. Die mensen loggen in via **Wachtwoord vergeten** — dus zet mail
+> aan vóór je ze uitnodigt.
+
 ## 1. Leads laten binnenkomen — BLOKKEREND
 
 Nu worden aanmeldingen alleen in de browser van de bezoeker bewaard. Zet je
@@ -34,7 +62,13 @@ kopersaccounts en aanmeldingen voor de aanbod-alert.
 ## 3. Juridisch — vóór de eerste euro advertentiebudget
 
 - [ ] Algemene voorwaarden en privacyverklaring (AVG) laten opstellen
-- [ ] Cookie-/analyticsmelding als je een analysetool gebruikt
+- [x] Cookiemelding: **Cookiebot (Usercentrics, gratis plan) is ingebouwd.**
+      Maak een gratis account op cookiebot.com, voeg panvia.nl toe en plak het
+      Domain Group ID in `js/consent.js` → `PANVIA_COOKIEBOT_ID`. De banner
+      (Nederlands, met automatische blokkering) en de cookieverklaring op
+      `cookies.html` doen daarna de rest. Zonder ID gebeurt er niets — dat is
+      nu prima, want de site plaatst alleen strikt noodzakelijke cookies.
+      Zet het ID sowieso vóór je de Meta Pixel of analytics toevoegt (§6).
 - [ ] Het boetebeding van € 10.000 in `spelregels.html` laten toetsen door een
       advocaat (art. 6:91 BW) — nu is het een concepttekst
 - [ ] Laten toetsen of de propositie onder bemiddelingsregels of de Wft valt
@@ -104,15 +138,18 @@ Wees hier eerlijk over richting bezoekers — het staat ook in de demo-balk:
 
 | Onderdeel | Status |
 |---|---|
-| Aanmeldingen (verkoper, koper, alert) | **Werkt** zodra `leadEndpoint` is ingevuld |
-| Betalingen | Gesimuleerd — er wordt niets afgeschreven. Voor echt betalen: Mollie of Stripe + een backend |
-| Chat en biedingen | Alleen in de browser van de bezoeker; de eigenaar ziet ze niet echt. Vereist database + accounts |
-| Inloggen | Bestaat niet; "Mijn Panvia" toont demonstratiedata |
+| Betalingen | **Werkt** — Mollie hosted checkout, webhook, verificatie server-side. Livegang = `MOLLIE_API_KEY` omwisselen naar `live_...` + redeploy |
+| Accounts & rollen | **Werkt** — één account per e-mailadres, rollen koper/verkoper worden pas actief ná betaling (Supabase) |
+| Inloggen | **Werkt** — e-mail + wachtwoord, sessie in een HttpOnly-cookie, lockout na 8 pogingen |
+| Wachtwoord vergeten | **Werkt zodra `RESEND_API_KEY` staat** (zie §0). Zonder key wordt er stil niets verstuurd |
+| Aanmeldingen (alert, projecten) | **Werkt** zodra `leadEndpoint` is ingevuld |
+| Chat en biedingen | Alleen in de browser van de bezoeker; de eigenaar ziet ze niet echt. Vereist berichten in de database |
+| Advertenties publiceren | De pandgegevens komen wél binnen (bij de betaling in `betalingen.metadata`), maar publiceren gebeurt nog handmatig |
 | Foto-upload | Toont een voorbeeld lokaal, uploadt niets |
 | Het aanbod | 20 verzonnen panden met AI-beelden |
 
-**De logische volgende stap** is Next.js op Vercel met een database (Supabase of
-Vercel Postgres), echte accounts, Mollie voor iDEAL en e-mailnotificaties. Dan
-werkt het platform echt end-to-end. Voor de campagne van de komende twee weken
-is de huidige opzet met een lead-endpoint voldoende: je verzamelt aanbod en
-kopers, en bouwt ondertussen door.
+**De logische volgende stap** is de laatste twee regels dichtzetten: foto's naar
+Supabase Storage, en de advertentie uit `betalingen.metadata` automatisch als
+echt pand publiceren. Daarna berichten en biedingen in de database, zodat een
+eigenaar ze ook op een ander apparaat ziet. Betalen, accounts en inloggen zijn
+daarvoor niet meer het obstakel — die staan.
