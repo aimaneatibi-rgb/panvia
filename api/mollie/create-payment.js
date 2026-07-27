@@ -36,8 +36,12 @@ module.exports = async function (req, res) {
   let body = req.body || {};
   if (typeof body === "string") { try { body = JSON.parse(body); } catch (e) { body = {}; } }
 
-  const soort = body.soort === "verkoper" ? "verkoper" : (body.soort === "koper" ? "koper" : null);
+  const GELDIGE_SOORTEN = ["verkoper", "koper", "project_s", "project_m", "project_l"];
+  const soort = GELDIGE_SOORTEN.indexOf(body.soort) !== -1 ? body.soort : null;
   if (!soort) return fout(res, 400, "Ongeldige soort.");
+  /* Koper én projecten zijn terugkerend: eerste betaling vestigt een
+     Mollie-mandaat, de webhook start daarna het abonnement. */
+  const terugkerend = soort === "koper" || soort.indexOf("project_") === 0;
 
   try {
     /* ---- 1. Wie is dit? ------------------------------------------------- */
@@ -77,10 +81,10 @@ module.exports = async function (req, res) {
     const ref = crypto.randomUUID();
     const basis = baseUrl(req);
 
-    /* Koper: eerst een Mollie-customer, zodat de eerste betaling een mandaat
-       oplevert voor het maandelijkse abonnement. */
+    /* Terugkerend (koper + projecten): eerst een Mollie-customer, zodat de
+       eerste betaling een mandaat oplevert voor het abonnement. */
     let customerId = null;
-    if (soort === "koper") {
+    if (terugkerend) {
       const klant = await mollie("/customers", {
         method: "POST",
         body: { name: naam || email, email: email }

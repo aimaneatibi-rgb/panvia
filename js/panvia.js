@@ -1774,6 +1774,20 @@
         "</div>";
     }
 
+    var PROJECT_BEDRAG = { project_s: ["Project S", "€ 5.021,50", "€ 4.150"], project_m: ["Project M", "€ 8.409,50", "€ 6.950"], project_l: ["Project L", "€ 12.644,50", "€ 10.450"] };
+    function klaarProject(d) {
+      var p = PROJECT_BEDRAG[d.soort];
+      blok.innerHTML =
+        "<div class='bevestiging'>" +
+          "<div class='vink' aria-hidden='true'>✓</div>" +
+          "<h2>Betaald. Je project staat klaar.</h2>" +
+          "<p class='grijs'>Je betaalde " + p[1] + " (" + p[2] + " + 21% btw) voor het eerste kwartaal van " + p[0] + ". Vanaf nu loopt het automatisch per kwartaal — per kwartaal opzegbaar. We controleren het eigendom en bouwen je projectpagina; je hoort binnen twee werkdagen van ons op " + escapeHTML(d.email || "je e-mailadres") + ".</p>" +
+          inlogRegel(d) +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='eigenaar.html'>Naar Mijn Panvia</a> " +
+          "<a class='btn btn-tertiair' href='projecten.html'>Terug naar Projecten</a></p>" +
+        "</div>";
+    }
+
     function nogBezig() {
       blok.innerHTML =
         "<div class='bevestiging'>" +
@@ -1787,7 +1801,9 @@
       var kop = status === "canceled" ? "Betaling geannuleerd" : (status === "expired" ? "Betaling verlopen" : "Betaling niet gelukt");
       var terugLink = soort === "verkoper"
         ? "<a class='btn btn-primair' href='plaatsen.html'>Probeer opnieuw</a>"
-        : "<a class='btn btn-primair' href='kopers.html'>Probeer opnieuw</a>";
+        : (String(soort).indexOf("project_") === 0
+          ? "<a class='btn btn-primair' href='projecten.html#aanmelden'>Probeer opnieuw</a>"
+          : "<a class='btn btn-primair' href='kopers.html'>Probeer opnieuw</a>");
       blok.innerHTML =
         "<div class='bevestiging'>" +
           "<h2>" + kop + "</h2>" +
@@ -1801,7 +1817,7 @@
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (!d || !d.ok) throw new Error(d && d.fout ? d.fout : "status onbekend");
-          if (d.status === "paid") return d.soort === "verkoper" ? klaarVerkoper(d) : klaarKoper(d);
+          if (d.status === "paid") return d.soort === "verkoper" ? klaarVerkoper(d) : (PROJECT_BEDRAG[d.soort] ? klaarProject(d) : klaarKoper(d));
           if (d.status === "open" || d.status === "pending" || d.status === "authorized") {
             if (pogingen++ < 10) return setTimeout(check, 2000);
             return nogBezig();
@@ -2212,9 +2228,8 @@
       if (!ok) return;
 
       var type = ($("input[name='pa-type']:checked") || {}).value || "woning";
-      var pakket = n >= 76 ? "Project L (€ 10.450 per kwartaal)" : (n >= 26 ? "Project M (€ 6.950 per kwartaal)" : (n >= 10 ? "Project S (€ 4.150 per kwartaal)" : "Losse plaatsing (< 10 eenheden)"));
 
-      verstuurLead("project-aanmelding", {
+      var gegevens = {
         organisatie: org.value.trim(),
         naam: naam.value.trim(),
         email: email.value.trim(),
@@ -2222,21 +2237,98 @@
         project: proj.value.trim(),
         type: type,
         eenheden: n,
-        passendPakket: pakket,
         toelichting: $("#pa-toelichting").value.trim()
-      });
+      };
 
-      $("#project-aanmeld-blok").innerHTML =
-        "<div class='bevestiging'>" +
-          "<div class='vink' aria-hidden='true'>✓</div>" +
-          "<h2>Aangemeld. We nemen contact op.</h2>" +
-          "<p class='grijs'><strong>Je betaalt nu niets.</strong> We kijken naar " + escapeHTML(proj.value.trim()) +
-          ", controleren het eigendom en nemen binnen twee werkdagen contact op via " + escapeHTML(email.value.trim()) + ".</p>" +
-          "<p class='grijs'>Op basis van <span class='tnum'>" + n + "</span> eenheden past <strong>" + escapeHTML(pakket) + "</strong>. " +
-          "Behoor je tot de eerste tien projecten, dan geldt de introkorting van 50% — twee jaar vastgezet.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+      /* Minder dan tien eenheden: geen pakket — verwijs naar losse plaatsing. */
+      if (n < 10) {
+        verstuurLead("project-aanmelding", Object.assign({ passendPakket: "Losse plaatsing (< 10 eenheden)" }, gegevens));
+        $("#project-aanmeld-blok").innerHTML =
+          "<div class='bevestiging'>" +
+            "<div class='vink' aria-hidden='true'>✓</div>" +
+            "<h2>Voor minder dan tien eenheden plaats je per pand</h2>" +
+            "<p class='grijs'>Projectpakketten beginnen bij tien eenheden. Met <span class='tnum'>" + n + "</span> " +
+            (n === 1 ? "eenheid" : "eenheden") + " ben je voordeliger uit met losse plaatsingen van <span class='tnum'>€ 895</span> per pand (excl. btw, 6 maanden).</p>" +
+            "<p style='margin-top:24px'><a class='btn btn-primair' href='plaatsen.html'>Plaats je pand</a></p>" +
+          "</div>";
+        window.scrollTo({ top: $("#aanmelden").offsetTop - 40, behavior: "smooth" });
+        return;
+      }
+
+      var pakketSoort = n >= 76 ? "project_l" : (n >= 26 ? "project_m" : "project_s");
+      var PAKKETTEN = {
+        project_s: { label: "Project S", bereik: "10 – 25 eenheden", excl: "€ 4.150", incl: "€ 5.021,50" },
+        project_m: { label: "Project M", bereik: "26 – 75 eenheden", excl: "€ 6.950", incl: "€ 8.409,50" },
+        project_l: { label: "Project L", bereik: "76+ eenheden",     excl: "€ 10.450", incl: "€ 12.644,50" }
+      };
+      var pk = PAKKETTEN[pakketSoort];
+
+      /* De projectgegevens gaan hoe dan ook naar de inbox — ook als de
+         betaling daarna strandt, weet Panvia wie er interesse had. */
+      verstuurLead("project-aanmelding", Object.assign({ passendPakket: pk.label + " (" + pk.excl + " per kwartaal)" }, gegevens));
+
+      /* Betaalstap: eerste kwartaal nu, mandaat voor de kwartalen erna. */
+      var blok = $("#project-aanmeld-blok");
+      var alIngelogd = Auth.ingelogd();
+      blok.innerHTML =
+        "<div class='betaal-overzicht'>" +
+          "<span class='kop-label'>Stap 2 van 2 · Start je project</span>" +
+          "<h2>" + escapeHTML(pk.label) + " voor " + escapeHTML(gegevens.project) + "</h2>" +
+          "<table class='overzicht-tabel'><tbody>" +
+            "<tr><th scope='row'>Pakket</th><td>" + pk.label + " · " + pk.bereik + " (jij: <span class='tnum'>" + n + "</span>)</td></tr>" +
+            "<tr><th scope='row'>Prijs</th><td><span class='tnum'>" + pk.excl + "</span> per kwartaal, excl. btw · afrekening <span class='tnum'>" + pk.incl + "</span> incl. 21% btw</td></tr>" +
+            "<tr><th scope='row'>Hoe het loopt</th><td>Je betaalt nu het eerste kwartaal. Daarna wordt hetzelfde bedrag automatisch elk kwartaal afgeschreven — <strong>per kwartaal opzegbaar</strong>, dus uitverkocht is klaar.</td></tr>" +
+            "<tr><th scope='row'>Daarna</th><td>We controleren het eigendom en bouwen samen je projectpagina — die staat binnen twee werkdagen klaar.</td></tr>" +
+          "</tbody></table>" +
+          (alIngelogd
+            ? "<p class='klein grijs'>Je bent ingelogd als " + escapeHTML(Auth.email()) + " — het project komt op dit account.</p>"
+            : "<div class='veld' style='max-width:360px'><label for='pa-wachtwoord'>Kies een wachtwoord</label>" +
+              "<input type='password' id='pa-wachtwoord' autocomplete='new-password'>" +
+              "<span class='hint'>Minstens 8 tekens. Hiermee log je straks in op Mijn Panvia.</span>" +
+              "<p class='fout' role='alert'></p></div>") +
+          "<div id='project-betaal-paneel' style='margin-top:24px'>" +
+            "<button type='button' class='btn btn-primair' id='project-betaal'>Betaal " + pk.incl + " en start</button> " +
+            "<button type='button' class='btn btn-tertiair' id='project-terug'>← Terug</button>" +
+            "<p class='klein grijs' style='margin-top:12px'>Beveiligde betaling via Mollie. Geen courtage, geen jaarcontract — je zit nooit langer vast dan het lopende kwartaal.</p>" +
+          "</div>" +
         "</div>";
       window.scrollTo({ top: $("#aanmelden").offsetTop - 40, behavior: "smooth" });
+
+      $("#project-terug").addEventListener("click", function () { window.location.reload(); });
+      $("#project-betaal").addEventListener("click", function () {
+        var wachtwoord = "";
+        if (!alIngelogd) {
+          var wwVeld = $("#pa-wachtwoord");
+          wachtwoord = wwVeld.value;
+          if (!wachtwoord || wachtwoord.length < 8) { zetFout(wwVeld, "Kies een wachtwoord van minstens 8 tekens."); return; }
+        }
+        var paneel = $("#project-betaal-paneel");
+        if (betaalModus() === "simulatie") {
+          /* Prototype op localhost: doorloop nabootsen */
+          mollieCheckout(paneel, {
+            bedrag: pk.incl,
+            periode: "per kwartaal (3 maanden) — " + pk.excl + " + 21% btw",
+            omschrijving: "Panvia " + pk.label,
+            knopLabel: "Betaal " + pk.incl,
+            klein: "Per kwartaal opzegbaar. Volgende kwartalen automatisch.",
+            onTerug: function () { window.location.reload(); },
+            onBetaald: function () {
+              blok.innerHTML =
+                "<div class='bevestiging'><div class='vink' aria-hidden='true'>✓</div>" +
+                "<h2>Betaald. Je project staat klaar.</h2>" +
+                "<p class='grijs'>" + pk.label + " is actief voor " + escapeHTML(gegevens.project) + ". We controleren het eigendom en bouwen je projectpagina — je hoort binnen twee werkdagen van ons.</p></div>";
+            }
+          });
+        } else {
+          mollieStart(paneel, {
+            soort: pakketSoort,
+            naam: gegevens.naam,
+            email: gegevens.email,
+            wachtwoord: wachtwoord || undefined,
+            gegevens: gegevens
+          });
+        }
+      });
     });
     $all("input, textarea", form).forEach(wisFoutBijInvoer);
   }

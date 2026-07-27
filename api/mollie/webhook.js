@@ -83,18 +83,28 @@ module.exports = async function (req, res) {
         });
       }
 
-      /* 3. Koper: abonnement starten (één keer). */
-      if (rij.soort === "koper" && rij.mollie_customer_id && !rij.mollie_subscription_id) {
+      /* 3. Abonnement starten (één keer, idempotent).
+         Koper: € 12,95 per maand, ingang volgende maand.
+         Project (S/M/L): kwartaalbedrag, ingang volgend kwartaal — de
+         eerste betaling dekt kwartaal 1. Opzeggen = subscription cancelen. */
+      const ABON = {
+        koper:     { value: "12.95",    interval: "1 month",  maanden: 1, oms: "Panvia kopersabonnement" },
+        project_s: { value: "5021.50",  interval: "3 months", maanden: 3, oms: "Panvia Project S — per kwartaal (€ 4.150 + 21% btw)" },
+        project_m: { value: "8409.50",  interval: "3 months", maanden: 3, oms: "Panvia Project M — per kwartaal (€ 6.950 + 21% btw)" },
+        project_l: { value: "12644.50", interval: "3 months", maanden: 3, oms: "Panvia Project L — per kwartaal (€ 10.450 + 21% btw)" }
+      };
+      const abonSpec = ABON[rij.soort];
+      if (abonSpec && rij.mollie_customer_id && !rij.mollie_subscription_id) {
         const start = new Date();
-        start.setMonth(start.getMonth() + 1);
+        start.setMonth(start.getMonth() + abonSpec.maanden);
         const startDatum = start.toISOString().slice(0, 10);
         const abo = await mollie("/customers/" + rij.mollie_customer_id + "/subscriptions", {
           method: "POST",
           body: {
-            amount: { currency: "EUR", value: "12.95" },
-            interval: "1 month",
+            amount: { currency: "EUR", value: abonSpec.value },
+            interval: abonSpec.interval,
             startDate: startDatum,
-            description: "Panvia kopersabonnement",
+            description: abonSpec.oms,
             webhookUrl: baseUrl(req) + "/api/mollie/webhook"
           }
         });
@@ -103,11 +113,17 @@ module.exports = async function (req, res) {
           prefer: "return=minimal",
           body: { mollie_subscription_id: abo.id }
         });
-        await db("/accounts?email=eq." + encodeURIComponent(rij.email), {
-          method: "PATCH",
-          prefer: "return=minimal",
-          body: { mollie_subscription_id: abo.id }
-        });
+        /* Op het account bewaren we alleen het kopersabonnement — een
+           projectabonnement mag dat veld niet overschrijven (iemand kan
+           koper én projectklant zijn). Projectabo's staan per betaling
+           in de betalingen-tabel. */
+        if (rij.soort === "koper") {
+          await db("/accounts?email=eq." + encodeURIComponent(rij.email), {
+            method: "PATCH",
+            prefer: "return=minimal",
+            body: { mollie_subscription_id: abo.id }
+          });
+        }
       }
     }
 

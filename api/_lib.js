@@ -16,7 +16,13 @@ const TARIEVEN = {
   koper:    { value: "12.95",   omschrijving: "Panvia kopersabonnement — eerste maand" },
   /* € 895 excl. btw + 21% = € 1.082,95 — de advertentieprijs is exclusief,
      de afrekening bij Mollie is het totaal inclusief btw. */
-  verkoper: { value: "1082.95", omschrijving: "Panvia plaatsing — 6 maanden online (€ 895 + 21% btw)" }
+  verkoper: { value: "1082.95", omschrijving: "Panvia plaatsing — 6 maanden online (€ 895 + 21% btw)" },
+  /* Projectpakketten: prijs per kwartaal excl. btw (4.150/6.950/10.450),
+     afgerekend incl. 21% btw. Eerste betaling vestigt het mandaat; de
+     webhook start daarna het kwartaalabonnement (interval 3 months). */
+  project_s: { value: "5021.50",  omschrijving: "Panvia Project S — kwartaal (€ 4.150 + 21% btw)" },
+  project_m: { value: "8409.50",  omschrijving: "Panvia Project M — kwartaal (€ 6.950 + 21% btw)" },
+  project_l: { value: "12644.50", omschrijving: "Panvia Project L — kwartaal (€ 10.450 + 21% btw)" }
 };
 
 function env(naam) {
