@@ -24,6 +24,8 @@ module.exports = async function (req, res) {
        Stond die nog op alleen koper/verkoper, dan strandde élke
        projectbetaling ná het aanmaken van de Mollie-betaling. */
     projectSoorten: { ok: false, fout: null },
+    /* Staan de profiel-, zakelijke en Mollie-betalergegevens in het schema? */
+    profielSchema: { ok: false, fout: null },
     mollie: { ok: false, fout: null },
     /* Is supabase-schema.sql (met accounts-rollen, sessies en resets) al
        uitgevoerd? Zonder dit werkt inloggen niet. */
@@ -68,6 +70,20 @@ module.exports = async function (req, res) {
     uitkomst.auth.schema = true;
   } catch (e) {
     uitkomst.auth.fout = String(e.message || e).slice(0, 200);
+  }
+
+  /* Profiel- en zakelijke kolommen: staan ze er, dan is de migratie gedraaid.
+     Ontbreekt er één, dan noemt PostgREST hem bij naam in de fout. */
+  try {
+    await db("/accounts?select=telefoon,koper_profiel_compleet,verkoper_profiel_compleet," +
+      "zoekgebied,budget_min,budget_max,koop_timing,financiering,eigen_woning_te_koop," +
+      "verkoop_reden,verkoop_termijn,eerder_via_makelaar,zoekt_zelf_woning,eigendomsvorm," +
+      "koper_profiel,verkoper_profiel,toestemming," +
+      "zakelijk,bedrijfsnaam,kvk_nummer,btw_nummer,factuur_email,po_nummer&limit=1");
+    await db("/betalingen?select=consumer_naam,consumer_iban,consumer_bic,telefoon&limit=1");
+    uitkomst.profielSchema.ok = true;
+  } catch (e) {
+    uitkomst.profielSchema.fout = String(e.message || e).slice(0, 200);
   }
 
   /* Mollie-rondje: methods opvragen is gratis en zonder bijwerkingen. */
