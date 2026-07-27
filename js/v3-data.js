@@ -118,7 +118,7 @@ var PANVIA_GIDSEN = [
       { kop: "Zet de cijfers voorop",
         tekst: "Zakelijke kopers rekenen: huurstroom, resterende looptijd, BAR, servicekosten, energielabel (let op de label-C-plicht voor kantoren). Zet die cijfers gewoon in je advertentie. Een zakelijke koper die moet mailen voor een huuroverzicht, is al half afgehaakt." },
       { kop: "Tien eenheden of meer? Dat is een project",
-        tekst: "Voor parken, complexen en ontwikkelingen betaal je per project, niet per woning: <strong>€ 5.950</strong> (10–25 eenheden), <strong>€ 9.950</strong> (26–75) of <strong>€ 14.950</strong> (76+) voor twaalf maanden. Je krijgt een eigen projectpagina met je eigen merk en renders, en belangstelling tonen is voor kopers gratis — een betaalmuur voor je wachtlijst zou je eigen funnel slopen." },
+        tekst: "Voor parken, complexen en ontwikkelingen betaal je per project, niet per woning: <strong>€ 4.150</strong> (10–25 eenheden), <strong>€ 6.950</strong> (26–75) of <strong>€ 10.450</strong> (76+) per kwartaal, exclusief btw — per kwartaal opzegbaar, dus je betaalt zolang de verkoop loopt. Je krijgt een eigen projectpagina met je eigen merk en renders, en belangstelling tonen is voor kopers gratis — een betaalmuur voor je wachtlijst zou je eigen funnel slopen." },
       { kop: "Wat ook hier geldt",
         tekst: "Alleen eigenaren (of beheerders met schriftelijk verkoopmandaat) verkopen op Panvia. Makelaars en dienstverleners mogen er niet verkopen of promoten — dat houdt het aanbod echt en rechtstreeks. Je eigen project promoten mag vanzelfsprekend wel; diensten aanbieden aan andere gebruikers niet." }
     ],

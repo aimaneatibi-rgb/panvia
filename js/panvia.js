@@ -2212,7 +2212,7 @@
       if (!ok) return;
 
       var type = ($("input[name='pa-type']:checked") || {}).value || "woning";
-      var pakket = n >= 76 ? "Project L (€ 14.950)" : (n >= 26 ? "Project M (€ 9.950)" : (n >= 10 ? "Project S (€ 5.950)" : "Losse plaatsing (< 10 eenheden)"));
+      var pakket = n >= 76 ? "Project L (€ 10.450 per kwartaal)" : (n >= 26 ? "Project M (€ 6.950 per kwartaal)" : (n >= 10 ? "Project S (€ 4.150 per kwartaal)" : "Losse plaatsing (< 10 eenheden)"));
 
       verstuurLead("project-aanmelding", {
         organisatie: org.value.trim(),
