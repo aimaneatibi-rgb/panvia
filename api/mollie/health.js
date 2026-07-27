@@ -20,6 +20,10 @@ module.exports = async function (req, res) {
         : (process.env.MOLLIE_API_KEY.indexOf("test_") === 0 ? "test" : "onbekend-formaat"))
       : null,
     database: { ok: false, fout: null },
+    /* Laat de check-constraint op betalingen.soort de projectpakketten door?
+       Stond die nog op alleen koper/verkoper, dan strandde élke
+       projectbetaling ná het aanmaken van de Mollie-betaling. */
+    projectSoorten: { ok: false, fout: null },
     mollie: { ok: false, fout: null },
     /* Is supabase-schema.sql (met accounts-rollen, sessies en resets) al
        uitgevoerd? Zonder dit werkt inloggen niet. */
@@ -29,15 +33,29 @@ module.exports = async function (req, res) {
   /* Database-rondje: échte schrijf-test (insert + delete van een healthrij).
      Alleen de sb_secret/service-role key mag door RLS heen schrijven — met de
      publishable key faalt dit, en dat is precies wat we willen weten. */
-  try {
+  async function schrijfTest(soort) {
     const rij = await db("/betalingen", {
       method: "POST",
-      body: { ref: require("crypto").randomUUID(), soort: "koper", email: "health@check.local", bedrag: 0, status: "health" }
+      body: { ref: require("crypto").randomUUID(), soort: soort, email: "health@check.local", bedrag: 0, status: "health" }
     });
     await db("/betalingen?id=eq." + rij[0].id, { method: "DELETE", prefer: "return=minimal" });
+  }
+
+  try {
+    await schrijfTest("koper");
     uitkomst.database.ok = true;
   } catch (e) {
     uitkomst.database.fout = String(e.message || e).slice(0, 200);
+  }
+
+  /* Dezelfde schrijf-test, nu met een projectpakket. Faalt alléén deze, dan
+     is de verbinding prima en is het schema achterhaald: draai de
+     soort-constraint uit supabase-schema.sql opnieuw. */
+  try {
+    await schrijfTest("project_s");
+    uitkomst.projectSoorten.ok = true;
+  } catch (e) {
+    uitkomst.projectSoorten.fout = String(e.message || e).slice(0, 200);
   }
 
   /* Auth-schema: bestaan de nieuwe kolommen en tabellen? Lezen is genoeg —
