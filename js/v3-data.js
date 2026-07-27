@@ -41,10 +41,11 @@ var PANVIA_GEO = {
 var PANVIA_GIDSEN = [
   {
     id: "verkopen",
+    slug: "zelf-je-huis-verkopen",
     titel: "Zelf je huis verkopen, van foto tot notaris",
     kort: "De complete route in zeven stappen — wat je zelf doet, wat je laat doen, en waar de valkuilen zitten.",
     leestijd: "8 min",
-    foto: "img/gids-verkopen.jpg",
+    foto: "/img/gids-verkopen.webp",
     secties: [
       { kop: "1 · Bepaal je vraagprijs met echte cijfers",
         tekst: "Kijk niet naar wat de buurman vraagt maar naar wat er vergelijkbaars <em>verkocht</em> is. Koopsommen van verkochte woningen vraag je per adres op bij het Kadaster, voor een paar euro. Pak drie tot vijf echt vergelijkbare verkopen van het afgelopen jaar en reken terug naar prijs per vierkante meter. Een te hoge vraagprijs kost je juist geld: de eerste twee weken zijn je etalage, daarna zakt de aandacht hard." },
@@ -62,14 +63,15 @@ var PANVIA_GIDSEN = [
         tekst: "Zijn jullie het eens, dan stelt een notaris de koopovereenkomst en de leveringsakte op. De koper kiest doorgaans de notaris, maar het mag anders. Na het tekenen heeft de koper drie dagen wettelijke bedenktijd. Panvia wijst je de weg — de akte zelf is aan de notaris, zo hoort het." }
     ],
     nietdoen: "Panvia taxeert niet, onderhandelt niet en bemiddelt niet. Deze gids is informatie, geen advies — bij twijfel over jouw situatie is een uur met een bouwkundig keurder of notaris zijn geld dubbel waard.",
-    cta: { label: "Plaats je pand voor € 895", href: "plaatsen.html" }
+    cta: { label: "Plaats je pand voor € 895", href: "/plaatsen" }
   },
   {
     id: "kopen",
+    slug: "huis-kopen-zonder-makelaar",
     titel: "Kopen zonder makelaar — rechtstreeks van de eigenaar",
     kort: "Van zoeken tot sleutel: hoe je zelf koopt, waar je op let bij een bezichtiging en wat een bod sterk maakt.",
     leestijd: "7 min",
-    foto: "img/gids-kopen.jpg",
+    foto: "/img/gids-kopen.webp",
     secties: [
       { kop: "1 · Weet wat je kunt besteden voor je verliefd wordt",
         tekst: "Laat je maximale hypotheek doorrekenen door je bank of een onafhankelijk adviseur voordat je gaat kijken. Reken naast de koopsom op zo'n 4 tot 6% kosten koper: overdrachtsbelasting (2% voor een woning die je zelf gaat bewonen), notaris, taxatie voor de hypotheek en eventueel een keuring." },
@@ -83,14 +85,15 @@ var PANVIA_GIDSEN = [
         tekst: "De notaris legt de afspraken vast in de koopovereenkomst. Na het tekenen heb jij drie dagen bedenktijd. Daarna regel je de hypotheek definitief, laat je taxeren, en op de afgesproken datum passeer je de leveringsakte. Loop vlak voor de overdracht nog een keer door het huis: staat alles er zoals afgesproken?" }
     ],
     nietdoen: "Panvia is geen hypotheek- of financieringsbemiddelaar en geeft geen koopadvies. Financiering regel je met je bank of een onafhankelijk adviseur.",
-    cta: { label: "Bekijk het aanbod", href: "aanbod.html" }
+    cta: { label: "Bekijk het aanbod", href: "/aanbod" }
   },
   {
     id: "bieden",
+    slug: "bieden-en-onderhandelen",
     titel: "Bieden, onderhandelen en de notaris",
     kort: "Hoe een bod werkt, welke voorbehouden normaal zijn en wat er bij de notaris gebeurt — voor koper en verkoper.",
     leestijd: "6 min",
-    foto: "img/gids-bieden.jpg",
+    foto: "/img/gids-bieden.webp",
     secties: [
       { kop: "Het bod: drie knoppen, niet een",
         tekst: "Prijs, voorbehouden en opleverdatum — aan alle drie kun je draaien. Een verkoper met haast geeft korting voor een snelle overdracht; een koper zonder financieringsvoorbehoud mag best iets lager bieden. Wie alleen naar de prijs kijkt, onderhandelt met een hand op de rug." },
@@ -104,14 +107,15 @@ var PANVIA_GIDSEN = [
         tekst: "De notaris stelt de koopovereenkomst op, controleert eigendom en hypotheken, en verzorgt de leveringsakte en de geldstromen. De koper heeft na het tekenen drie dagen wettelijke bedenktijd. De kosten voor de leveringsakte betaalt gebruikelijk de koper (kosten koper). Panvia wijst beide kanten de weg naar een notaris — daar stopt onze rol, bewust." }
     ],
     nietdoen: "Panvia onderhandelt niet mee en is geen partij bij de koop. Wat jullie afspreken, leggen jullie samen bij de notaris vast.",
-    cta: { label: "Zo werkt bieden op een pand", href: "kopers.html" }
+    cta: { label: "Zo werkt bieden op een pand", href: "/kopers" }
   },
   {
     id: "zakelijk",
+    slug: "zakelijk-vastgoed-verkopen",
     titel: "Zakelijk vastgoed en projecten verkopen",
     kort: "Voor eigenaren van units, hallen en portefeuilles — en voor ontwikkelaars met tien of meer eenheden.",
     leestijd: "5 min",
-    foto: "img/gids-zakelijk.jpg",
+    foto: "/img/gids-zakelijk.webp",
     secties: [
       { kop: "Jij kent je koper vaak al",
         tekst: "De meeste zakelijke transacties beginnen in het eigen netwerk: de huurder die wil kopen, de belegger uit een eerdere deal, de buurman die wil uitbreiden. Een bedrijfsmakelaar inhuren om zichtbaar te zijn terwijl je de koper al kent — dat is precies de kostenpost die je hier overslaat. Een vaste prijs: <strong>€ 895</strong> per pand, zes maanden." },
@@ -123,6 +127,6 @@ var PANVIA_GIDSEN = [
         tekst: "Alleen eigenaren (of beheerders met schriftelijk verkoopmandaat) verkopen op Panvia. Makelaars en dienstverleners mogen er niet verkopen of promoten — dat houdt het aanbod echt en rechtstreeks. Je eigen project promoten mag vanzelfsprekend wel; diensten aanbieden aan andere gebruikers niet." }
     ],
     nietdoen: "Panvia taxeert niet en bemiddelt niet — ook zakelijk niet. Voor fiscale of juridische structuren (bv, btw-optie, huurgarantie) zit je bij je eigen adviseur beter.",
-    cta: { label: "Bekijk Panvia Zakelijk", href: "zakelijk.html" }
+    cta: { label: "Bekijk Panvia Zakelijk", href: "/zakelijk" }
   }
 ];

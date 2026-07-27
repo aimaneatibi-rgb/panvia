@@ -289,7 +289,7 @@
     var alt = "Voorbeeldfoto van het pand aan " + pand.adres + " in " + pand.plaats;
     return (
       "<article class='pandkaart'>" +
-        "<a class='pandkaart-link' href='pand.html?id=" + pand.id + "'>" +
+        "<a class='pandkaart-link' href='/pand?id=" + pand.id + "'>" +
           "<div class='pandkaart-foto'><img src='" + pandBeeld(pand, 0) + "' alt='" + alt + "' loading='lazy'>" + hartKnopHTML(pand.id) + "</div>" +
           "<div class='pandkaart-body'>" +
             "<div class='pandkaart-top'>" +
@@ -328,7 +328,7 @@
     var plaatsRegel = p.plaats + (p.land && p.land !== "Nederland" ? " · " + p.land : "");
     return (
       "<article class='pandkaart projectkaart'>" +
-        "<a class='pandkaart-link' href='project.html?id=" + p.id + "'>" +
+        "<a class='pandkaart-link' href='/project?id=" + p.id + "'>" +
           "<div class='pandkaart-foto'>" +
             "<img src='" + projectBeeld(p) + "' alt='Voorbeeldbeeld van project " + escapeHTML(p.naam) + "' loading='lazy'>" +
             "<span class='project-badge tnum'>" + p.beschikbaar + " van " + p.eenheden + " beschikbaar</span>" +
@@ -672,16 +672,16 @@
     var slot = $("#nav-account");
     if (!slot) return;
     if (!Auth.ingelogd()) {
-      slot.innerHTML = "<a href='inloggen.html'>Inloggen</a>";
+      slot.innerHTML = "<a href='/inloggen'>Inloggen</a>";
       return;
     }
     /* Verkopers gaan naar hun inbox, kopers naar hun accountpagina. */
-    var doel = Auth.isVerkoper() ? "eigenaar.html" : "inloggen.html";
+    var doel = Auth.isVerkoper() ? "/eigenaar" : "/inloggen";
     slot.innerHTML =
       "<a class='nav-account-naam' href='" + doel + "' title='Mijn Panvia'>" + escapeHTML(Auth.voornaam()) + "</a>" +
       "<button type='button' class='nav-uitlog' id='nav-uitlog'>Uitloggen</button>";
     $("#nav-uitlog").addEventListener("click", function () {
-      Auth.uitloggen().then(function () { window.location.href = "index.html"; });
+      Auth.uitloggen().then(function () { window.location.href = "/"; });
     });
   }
 
@@ -706,8 +706,10 @@
      ------------------------------------------------------------------------ */
   function veiligeTerugkeer() {
     var terug = new URLSearchParams(window.location.search).get("terug") || "";
-    /* Alleen een pagina op deze site, nooit een adres van buiten. */
-    return /^[a-z0-9-]+\.html$/i.test(terug) ? terug : "";
+    /* Alleen een pagina op deze site, nooit een adres van buiten.
+       Accepteert "kopers" en (oude links) "kopers.html". */
+    if (!/^[a-z0-9-]+(\.html)?$/i.test(terug)) return "";
+    return "/" + terug.replace(/\.html$/i, "");
   }
 
   function initInloggen() {
@@ -724,8 +726,8 @@
           "<p class='klein grijs tnum'>" + escapeHTML(Auth.email()) + "</p>" +
           "<p style='margin-top:24px'>" +
             (Auth.isVerkoper()
-              ? "<a class='btn btn-primair' href='eigenaar.html'>Naar Mijn Panvia</a> "
-              : "<a class='btn btn-primair' href='aanbod.html'>Naar het aanbod</a> ") +
+              ? "<a class='btn btn-primair' href='/eigenaar'>Naar Mijn Panvia</a> "
+              : "<a class='btn btn-primair' href='/aanbod'>Naar het aanbod</a> ") +
             "<button type='button' class='btn btn-tertiair' id='login-uitlog'>Uitloggen</button>" +
           "</p>" +
         "</div>";
@@ -754,7 +756,7 @@
         var lokaal = Auth.lokaalLezen();
         if (lokaal && lokaal.email && lokaal.email.toLowerCase() === email.value.trim().toLowerCase()) {
           Auth.account = lokaal;
-          window.location.href = veiligeTerugkeer() || "inloggen.html";
+          window.location.href = veiligeTerugkeer() || "/inloggen";
         } else {
           melding.textContent = "Lokale simulatie: er staat op dit apparaat nog geen account met dit e-mailadres.";
         }
@@ -770,7 +772,7 @@
         body: JSON.stringify({ email: email.value.trim(), wachtwoord: wachtwoord.value })
       }).then(function (r) { return r.json(); }).then(function (d) {
         if (d && d.ok) {
-          window.location.href = veiligeTerugkeer() || "inloggen.html";
+          window.location.href = veiligeTerugkeer() || "/inloggen";
           return;
         }
         throw new Error((d && d.fout) || "Inloggen lukte niet.");
@@ -801,7 +803,7 @@
           "om een nieuw wachtwoord te kiezen. De link is een uur geldig en werkt één keer.</p>" +
           "<p class='klein grijs'>Niets ontvangen? Kijk even in je spam. Blijft het uit, mail ons dan op " +
           escapeHTML(cfg("contactEmail", "hallo@panvia.nl")) + ".</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-secundair' href='inloggen.html'>Terug naar inloggen</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-secundair' href='/inloggen'>Terug naar inloggen</a></p>" +
         "</div>";
     }
 
@@ -845,7 +847,7 @@
         "<div class='bevestiging'>" +
           "<h2>Deze link is niet compleet</h2>" +
           "<p class='grijs'>Open de link uit de mail nog eens, of vraag een nieuwe aan.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='wachtwoord-vergeten.html'>Vraag een nieuwe link aan</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/wachtwoord-vergeten'>Vraag een nieuwe link aan</a></p>" +
         "</div>";
       return;
     }
@@ -877,8 +879,8 @@
             "<div class='vink' aria-hidden='true'>✓</div>" +
             "<h2>Gelukt — je bent ingelogd</h2>" +
             "<p class='grijs'>Je nieuwe wachtwoord staat klaar en je bent op dit apparaat ingelogd. Andere apparaten zijn uitgelogd.</p>" +
-            "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Naar het aanbod</a> " +
-            "<a class='btn btn-tertiair' href='inloggen.html'>Naar mijn account</a></p>" +
+            "<p style='margin-top:24px'><a class='btn btn-primair' href='/aanbod'>Naar het aanbod</a> " +
+            "<a class='btn btn-tertiair' href='/inloggen'>Naar mijn account</a></p>" +
           "</div>";
       }).catch(function (err) {
         melding.textContent = err.message;
@@ -908,7 +910,7 @@
      ------------------------------------------------------------------------ */
   function gidsKaartHTML(g) {
     return (
-      "<a class='gids-kaart' href='gids.html?g=" + g.id + "'>" +
+      "<a class='gids-kaart' href='/gids/" + (g.slug || g.id) + "'>" +
         "<div class='gids-foto'><img src='" + g.foto + "' alt='' loading='lazy'>" +
           "<span class='gids-badge'>Gids · " + g.leestijd + "</span></div>" +
         "<div class='gids-body'>" +
@@ -927,24 +929,14 @@
   }
 
   function initGids() {
+    /* De gidsen zijn statische pagina's onder /gids/<slug> geworden (SEO).
+       Oude links op gids.html?g=… sturen we daarheen door. */
     var el = $("#gids-inhoud");
     if (!el || typeof PANVIA_GIDSEN === "undefined") return;
     var id = new URLSearchParams(window.location.search).get("g");
     var gids = null;
     PANVIA_GIDSEN.forEach(function (g) { if (g.id === id) gids = g; });
-    if (!gids) { window.location.replace("gidsen.html"); return; }
-    document.title = gids.titel + " | Panvia";
-    el.innerHTML =
-      "<div class='gids-hero'><img src='" + gids.foto + "' alt=''>" +
-        "<span class='gids-badge'>Gids · " + gids.leestijd + "</span></div>" +
-      "<span class='kop-label'>Kennis, geen advies</span>" +
-      "<h1>" + escapeHTML(gids.titel) + "</h1>" +
-      "<p class='body-l grijs'>" + escapeHTML(gids.kort) + "</p>" +
-      gids.secties.map(function (s) {
-        return "<section class='gids-sectie'><h2>" + escapeHTML(s.kop) + "</h2><p>" + s.tekst + "</p></section>";
-      }).join("") +
-      "<div class='nb-blok' style='margin-top:40px'><p style='margin-bottom:0'><strong>Wat Panvia niet doet:</strong> " + escapeHTML(gids.nietdoen) + "</p></div>" +
-      "<p style='margin-top:32px'><a class='btn btn-primair' href='" + gids.cta.href + "'>" + escapeHTML(gids.cta.label) + "</a></p>";
+    window.location.replace(gids ? "/gids/" + gids.slug : "/gidsen");
   }
 
   /* ------------------------------------------------------------------------
@@ -1001,7 +993,7 @@
           "<p class='klein grijs'>" + (Auth.isVerkoper()
             ? "Zodra een koper je schrijft of biedt, staat het gesprek hier."
             : "Start een gesprek via de chat op een pandpagina — die vind je in het aanbod.") + "</p>" +
-          "<a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></div>";
+          "<a class='btn btn-secundair' href='/aanbod'>Bekijk het aanbod</a></div>";
         return;
       }
       el.innerHTML = lijst.map(function (g) {
@@ -1043,7 +1035,7 @@
           "<input type='text' id='bp-tekst' autocomplete='off'>" +
           "<button type='submit' class='btn btn-primair'>Stuur</button>" +
         "</form>" +
-        (pand && !eigenaarThread ? "<p class='klein grijs' style='margin-top:8px'><a href='pand.html?id=" + pand.id + "'>Bekijk het pand →</a></p>" : "");
+        (pand && !eigenaarThread ? "<p class='klein grijs' style='margin-top:8px'><a href='/pand?id=" + pand.id + "'>Bekijk het pand →</a></p>" : "");
       var thread = $("#bp-thread");
       thread.scrollTop = thread.scrollHeight;
       $("#bp-terug").addEventListener("click", function () { toonLijst(); });
@@ -1263,7 +1255,7 @@
           (isProject ? "vanaf " : "") + prijsKort(prijs) + "</span>",
         iconSize: null
       });
-      var href = isProject ? "project.html?id=" + item.id : "pand.html?id=" + item.id;
+      var href = isProject ? "/project?id=" + item.id : "/pand?id=" + item.id;
       var titel = isProject ? item.naam : item.adres;
       var foto = isProject ? projectBeeld(item) : pandBeeld(item, 0);
       var marker = L.marker(pos, { icon: icon, title: titel + ", " + item.plaats });
@@ -1568,20 +1560,20 @@
       /* Bekend e-mailadres: niet doorstoten naar betalen, maar even laten
          inloggen. Daarna staat alles al ingevuld. */
       if (data && data.code === "inloggen") {
-        var terug = window.location.pathname.split("/").pop() || "kopers.html";
+        var terug = window.location.pathname.split("/").pop().replace(/.html$/i, "") || "kopers";
         container.innerHTML =
           "<div class='nb-blok'>" +
             "<p style='margin:0 0 16px'><strong>Je hebt al een Panvia-account met dit e-mailadres.</strong> " +
             "Log even in — daarna hoef je alleen nog te betalen.</p>" +
-            "<p style='margin:0'><a class='btn btn-primair' href='inloggen.html?terug=" + encodeURIComponent(terug) + "'>Inloggen</a> " +
-            "<a class='btn btn-tertiair' href='wachtwoord-vergeten.html'>Wachtwoord vergeten?</a></p>" +
+            "<p style='margin:0'><a class='btn btn-primair' href='/inloggen?terug=" + encodeURIComponent(terug) + "'>Inloggen</a> " +
+            "<a class='btn btn-tertiair' href='/wachtwoord-vergeten'>Wachtwoord vergeten?</a></p>" +
           "</div>";
         return;
       }
       if (data && data.code === "al-actief") {
         container.innerHTML =
           "<div class='nb-blok'><p style='margin:0 0 16px'><strong>" + escapeHTML(data.fout) + "</strong> " +
-          "Er is niets afgeschreven.</p><p style='margin:0'><a class='btn btn-primair' href='aanbod.html'>Naar het aanbod</a></p></div>";
+          "Er is niets afgeschreven.</p><p style='margin:0'><a class='btn btn-primair' href='/aanbod'>Naar het aanbod</a></p></div>";
         return;
       }
       throw new Error((data && data.fout) || "onbekende fout");
@@ -1627,7 +1619,7 @@
           "<h2>Je bent al lid</h2>" +
           "<p class='grijs'>Je kopersabonnement staat op naam van <strong>" + escapeHTML(Auth.naam() || Auth.email()) + "</strong> (" +
           escapeHTML(Auth.email()) + "). Je kunt op elk pand rechtstreeks met de eigenaar praten, bieden en de volledige verkoperinformatie zien.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/aanbod'>Bekijk het aanbod</a></p>" +
         "</div>";
       return;
     }
@@ -1659,7 +1651,7 @@
           "<h2>Betaald. Je bent nu lid.</h2>" +
           "<p class='grijs'>Je betaling is gelukt en je account is actief. Vanaf nu praat je op elk pand rechtstreeks met de eigenaar, doe je biedingen en zie je de volledige verkoperinformatie. Je betaalt " + KOPER_FEE + " per maand en zegt elke maand met één klik op.</p>" +
           "<p class='klein grijs'>Prototype: er wordt niets afgeschreven en je gegevens worden niet doorverkocht — aan niemand, ooit.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/aanbod'>Bekijk het aanbod</a></p>" +
         "</div>";
       zetStap(3);
       window.scrollTo({ top: blok.offsetTop - 40, behavior: "smooth" });
@@ -1733,7 +1725,7 @@
     var blok = $("#betaald-blok");
     if (!blok) return;
     var ref = new URLSearchParams(window.location.search).get("ref");
-    if (!ref) { window.location.href = "index.html"; return; }
+    if (!ref) { window.location.href = "/"; return; }
 
     var pogingen = 0;
 
@@ -1748,7 +1740,7 @@
           escapeHTML(d.email || "je e-mailadres") + " en je wachtwoord.</p>";
       }
       return "<p class='klein grijs'>Log in met " + escapeHTML(d.email || "je e-mailadres") + " en het wachtwoord dat je koos — " +
-        "<a href='inloggen.html'>naar inloggen</a>.</p>";
+        "<a href='/inloggen'>naar inloggen</a>.</p>";
     }
 
     function klaarKoper(d) {
@@ -1758,7 +1750,7 @@
           "<h2>Betaald. Je bent nu lid.</h2>" +
           "<p class='grijs'>Je kopersabonnement is actief" + (d.naam ? ", " + escapeHTML(String(d.naam).split(" ")[0]) : "") + ". Vanaf nu praat je op elk pand rechtstreeks met de eigenaar, doe je biedingen en zie je de volledige verkoperinformatie. Je betaalt " + KOPER_FEE + " per maand en zegt elke maand met één klik op.</p>" +
           inlogRegel(d) +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/aanbod'>Bekijk het aanbod</a></p>" +
         "</div>";
     }
 
@@ -1769,8 +1761,8 @@
           "<h2>Betaald. Je pand staat klaar.</h2>" +
           "<p class='grijs'>Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 6 maanden. We controleren je advertentie en zetten hem daarna online — je hoort van ons op " + escapeHTML(d.email || "je e-mailadres") + ". Geen courtage erachteraan, ook niet als je pand verkoopt.</p>" +
           inlogRegel(d) +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='eigenaar.html'>Naar Mijn Panvia</a> " +
-          "<a class='btn btn-tertiair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/eigenaar'>Naar Mijn Panvia</a> " +
+          "<a class='btn btn-tertiair' href='/aanbod'>Bekijk het aanbod</a></p>" +
         "</div>";
     }
 
@@ -1783,8 +1775,8 @@
           "<h2>Betaald. Je project staat klaar.</h2>" +
           "<p class='grijs'>Je betaalde " + p[1] + " (" + p[2] + " + 21% btw) voor het eerste kwartaal van " + p[0] + ". Vanaf nu loopt het automatisch per kwartaal — per kwartaal opzegbaar. We controleren het eigendom en bouwen je projectpagina; je hoort binnen twee werkdagen van ons op " + escapeHTML(d.email || "je e-mailadres") + ".</p>" +
           inlogRegel(d) +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='eigenaar.html'>Naar Mijn Panvia</a> " +
-          "<a class='btn btn-tertiair' href='projecten.html'>Terug naar Projecten</a></p>" +
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/eigenaar'>Naar Mijn Panvia</a> " +
+          "<a class='btn btn-tertiair' href='/projecten'>Terug naar Projecten</a></p>" +
         "</div>";
     }
 
@@ -1800,10 +1792,10 @@
     function mislukt(status, soort) {
       var kop = status === "canceled" ? "Betaling geannuleerd" : (status === "expired" ? "Betaling verlopen" : "Betaling niet gelukt");
       var terugLink = soort === "verkoper"
-        ? "<a class='btn btn-primair' href='plaatsen.html'>Probeer opnieuw</a>"
+        ? "<a class='btn btn-primair' href='/plaatsen'>Probeer opnieuw</a>"
         : (String(soort).indexOf("project_") === 0
-          ? "<a class='btn btn-primair' href='projecten.html#aanmelden'>Probeer opnieuw</a>"
-          : "<a class='btn btn-primair' href='kopers.html'>Probeer opnieuw</a>");
+          ? "<a class='btn btn-primair' href='/projecten#aanmelden'>Probeer opnieuw</a>"
+          : "<a class='btn btn-primair' href='/kopers'>Probeer opnieuw</a>");
       blok.innerHTML =
         "<div class='bevestiging'>" +
           "<h2>" + kop + "</h2>" +
@@ -2107,8 +2099,8 @@
             ? "<p class='klein grijs'>Je bent ingelogd als <strong>" + escapeHTML(Auth.voornaam()) + "</strong>, maar het kopersabonnement staat nog niet op je account. Eén stap en je zit erin.</p>"
             : "") +
           "<p style='margin: 20px 0 0;'>" +
-            "<a class='btn btn-primair' href='kopers.html'>Word lid — " + KOPER_FEE + " per maand</a>" +
-            (ingelogdZonderRol ? "" : " <a class='btn btn-tertiair' href='inloggen.html?terug=kopers.html'>Ik heb al een account</a>") +
+            "<a class='btn btn-primair' href='/kopers'>Word lid — " + KOPER_FEE + " per maand</a>" +
+            (ingelogdZonderRol ? "" : " <a class='btn btn-tertiair' href='/inloggen?terug=kopers'>Ik heb al een account</a>") +
           "</p>" +
           "<p class='klein grijs' style='margin: 16px 0 0;'>Zoeken en kijken blijft gratis; opzeggen kan elke maand met één klik.</p>" +
         "</div>";
@@ -2249,7 +2241,7 @@
             "<h2>Voor minder dan tien eenheden plaats je per pand</h2>" +
             "<p class='grijs'>Projectpakketten beginnen bij tien eenheden. Met <span class='tnum'>" + n + "</span> " +
             (n === 1 ? "eenheid" : "eenheden") + " ben je voordeliger uit met losse plaatsingen van <span class='tnum'>€ 895</span> per pand (excl. btw, 6 maanden).</p>" +
-            "<p style='margin-top:24px'><a class='btn btn-primair' href='plaatsen.html'>Plaats je pand</a></p>" +
+            "<p style='margin-top:24px'><a class='btn btn-primair' href='/plaatsen'>Plaats je pand</a></p>" +
           "</div>";
         window.scrollTo({ top: $("#aanmelden").offsetTop - 40, behavior: "smooth" });
         return;
@@ -2429,11 +2421,11 @@
         ? "<h2>Hier staat straks jouw advertentie</h2>" +
           "<p class='grijs'>Je bent ingelogd als " + escapeHTML(Auth.voornaam()) + ", maar er staat nog geen plaatsing op je account. " +
           "Zodra je je pand plaatst, vind je hier je advertentie, je gesprekken en je biedingen.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='plaatsen.html'>Plaats je pand</a></p>"
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/plaatsen'>Plaats je pand</a></p>"
         : "<h2>Log in om Mijn Panvia te zien</h2>" +
           "<p class='grijs'>Je advertentie, gesprekken en biedingen staan achter je account. Log in met je e-mailadres en wachtwoord.</p>" +
-          "<p style='margin-top:24px'><a class='btn btn-primair' href='inloggen.html?terug=eigenaar.html'>Inloggen</a> " +
-          "<a class='btn btn-tertiair' href='plaatsen.html'>Nog geen pand geplaatst?</a></p>";
+          "<p style='margin-top:24px'><a class='btn btn-primair' href='/inloggen?terug=eigenaar'>Inloggen</a> " +
+          "<a class='btn btn-tertiair' href='/plaatsen'>Nog geen pand geplaatst?</a></p>";
       lijst.parentNode.insertBefore(paneel, lijst);
       /* De demo-inbox eronder blijft weg zolang er geen verkopersrol is. */
       $all(".eigenaar-pand, #inbox-lijst, #inbox-gesprek, main .nb-blok").forEach(function (el) { el.hidden = true; });
@@ -2879,7 +2871,7 @@
               (cfg("lanceringsDatumTekst", "") ? "zodra Panvia opengaat op " + cfg("lanceringsDatumTekst", "") : "zodra het platform opengaat") + ".</p>" +
               "<p class='grijs'>Als eerste aanmelder plaats je je pand voor " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden — " +
               "en pas nadat je akkoord hebt gegeven. Geen courtage, geen succesfee.</p>" +
-              "<p style='margin-top:24px'><a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+              "<p style='margin-top:24px'><a class='btn btn-secundair' href='/aanbod'>Bekijk het aanbod</a></p>" +
             "</div>"
           : "<div class='bevestiging'>" +
               "<div class='vink' aria-hidden='true'>✓</div>" +
@@ -2889,7 +2881,7 @@
               "en staat 6 maanden op Panvia. Kopers nemen rechtstreeks contact met je op.</p>" +
               "<p class='grijs'>Wat wij nu doen: je advertentie controleren en publiceren. " +
               "Wat jij doet: praten met kopers en verkopen. Zo is het verdeeld.</p>" +
-              "<p style='margin-top:24px'><a class='btn btn-secundair' href='aanbod.html'>Bekijk het aanbod</a></p>" +
+              "<p style='margin-top:24px'><a class='btn btn-secundair' href='/aanbod'>Bekijk het aanbod</a></p>" +
             "</div>";
           var kop = $("h2", paneel);
           if (kop) { kop.setAttribute("tabindex", "-1"); kop.focus(); }
@@ -3112,7 +3104,7 @@
     var opent = datumTekst ? "Panvia opent " + datumTekst : "Panvia opent binnenkort";
     balk.innerHTML = "<div class='container'><strong>Voorbeeldaanbod.</strong> " + opent + "; " +
       "de panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
-      "<a href='plaatsen.html'>Meld je eigen pand aan</a> — dat is wel echt.</div>";
+      "<a href='/plaatsen'>Meld je eigen pand aan</a> — dat is wel echt.</div>";
     var header = $(".site-header");
     if (header && header.parentNode) header.parentNode.insertBefore(balk, header.nextSibling);
   }

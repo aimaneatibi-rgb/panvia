@@ -2178,7 +2178,7 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
   background: var(--nacht);
   background-image:
     linear-gradient(180deg, rgba(11, 16, 48, .62) 0%, rgba(11, 16, 48, .38) 55%, rgba(11, 16, 48, .66) 100%),
-    url("../img/hero.jpg");
+    url("../img/hero.webp");
   background-size: cover;
   background-position: center 62%;
   padding-top: 108px;
