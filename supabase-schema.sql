@@ -16,17 +16,24 @@ create table if not exists betalingen (
   id uuid primary key default gen_random_uuid(),
   ref uuid unique not null,                -- onze referentie in de redirect-URL
   mollie_payment_id text unique,           -- tr_xxx (na aanmaken bekend)
-  mollie_customer_id text,                 -- cst_xxx (alleen koper/abonnement)
-  mollie_subscription_id text,             -- sub_xxx (na eerste betaling koper)
-  soort text not null check (soort in ('koper', 'verkoper')),
+  mollie_customer_id text,                 -- cst_xxx (koper + projecten: abonnement)
+  mollie_subscription_id text,             -- sub_xxx (na de eerste betaling)
+  soort text not null,
   naam text,
   email text not null,
   bedrag numeric not null,
   status text not null default 'open',     -- open/paid/failed/canceled/expired
-  metadata jsonb,                          -- verkoper: de pandgegevens
+  metadata jsonb,                          -- verkoper: pandgegevens · project: projectgegevens
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Toegestane soorten. Apart van de create table, want bestaande installaties
+-- kenden alleen 'koper' en 'verkoper' — de projectpakketten kwamen er later
+-- bij en liepen daardoor stuk op de oude check.
+alter table betalingen drop constraint if exists betalingen_soort_check;
+alter table betalingen add constraint betalingen_soort_check
+  check (soort in ('koper', 'verkoper', 'project_s', 'project_m', 'project_l'));
 
 -- Het wachtwoord dat de bezoeker vóór de betaling koos, meteen gehasht
 -- (scrypt). De klaartekst raakt de database nooit. De webhook zet deze hash

@@ -1,6 +1,7 @@
 /* ==========================================================================
    POST /api/mollie/create-payment
-   Body: { soort: "koper"|"verkoper", naam, email, wachtwoord?, gegevens? }
+   Body: { soort: "koper"|"verkoper"|"project_s"|"project_m"|"project_l",
+           naam, email, wachtwoord?, gegevens? }
 
    Maakt de Mollie-betaling aan en geeft de checkout-URL terug. Het bedrag
    staat server-side vast (TARIEVEN). Het account wordt hier NIET aangemaakt —
@@ -109,22 +110,30 @@ module.exports = async function (req, res) {
     });
 
     /* ---- 3. Alles wat we later nodig hebben, bewaren wij zelf ------------ */
-    await db("/betalingen", {
-      method: "POST",
-      prefer: "return=minimal",
-      body: {
-        ref: ref,
-        mollie_payment_id: betaling.id,
-        mollie_customer_id: customerId,
-        soort: soort,
-        naam: naam,
-        email: email,
-        bedrag: Number(tarief.value),
-        status: betaling.status || "open",
-        wachtwoord_hash: wachtwoordHash,
-        metadata: body.gegevens && typeof body.gegevens === "object" ? body.gegevens : null
-      }
-    });
+    /* Lukt dit niet, dan kunnen we de betaling later nergens aan koppelen.
+       De betaling bij Mollie moet dan weg — anders staat er een checkout
+       open die bij ons nooit landt. */
+    try {
+      await db("/betalingen", {
+        method: "POST",
+        prefer: "return=minimal",
+        body: {
+          ref: ref,
+          mollie_payment_id: betaling.id,
+          mollie_customer_id: customerId,
+          soort: soort,
+          naam: naam,
+          email: email,
+          bedrag: Number(tarief.value),
+          status: betaling.status || "open",
+          wachtwoord_hash: wachtwoordHash,
+          metadata: body.gegevens && typeof body.gegevens === "object" ? body.gegevens : null
+        }
+      });
+    } catch (dbFout) {
+      await mollie("/payments/" + betaling.id, { method: "DELETE" }).catch(function () {});
+      throw dbFout;
+    }
 
     const checkoutUrl = betaling._links && betaling._links.checkout ? betaling._links.checkout.href : null;
     if (!checkoutUrl) return fout(res, 502, "Geen checkout-URL van Mollie ontvangen.");

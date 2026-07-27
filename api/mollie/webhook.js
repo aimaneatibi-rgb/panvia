@@ -48,8 +48,11 @@ module.exports = async function (req, res) {
 
     if (status === "paid") {
       const nu = new Date().toISOString();
-      const rolVeld = rij.soort === "koper" ? "koper_actief" : "verkoper_actief";
-      const sindsVeld = rij.soort === "koper" ? "koper_sinds" : "verkoper_sinds";
+      /* Rol op het account. Een projectklant is een aanbieder en krijgt dus
+         de verkopersrol — daarmee komt hij in Mijn Panvia bij zijn plaatsing. */
+      const isKoper = rij.soort === "koper";
+      const rolVeld = isKoper ? "koper_actief" : "verkoper_actief";
+      const sindsVeld = isKoper ? "koper_sinds" : "verkoper_sinds";
 
       /* 2. Account: bestaat het al, dan komt de rol erbij. Bestaande naam en
             wachtwoord blijven staan — een nieuwe betaling mag nooit iemands
