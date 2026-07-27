@@ -153,7 +153,80 @@ create table if not exists wachtwoord_resets (
 );
 
 -- --------------------------------------------------------------------------
--- 5. Indexen & RLS
+-- 5. PROFIEL — wat we van iemand weten naast de inlog.
+--
+--    Opzet: de velden waarop we willen filteren en segmenteren staan als
+--    echte kolommen (budget, gebied, timing). De lange staart gaat in jsonb,
+--    zodat er geen migratie nodig is elke keer dat er een vraag bijkomt.
+--
+--    Telefoon is voortaan een tweede inlognaam: uniek, genormaliseerd naar
+--    E.164 (+31612345678) door de API.
+-- --------------------------------------------------------------------------
+
+-- Bestaande nummers eerst opschonen, anders kan de unieke index er niet op.
+update accounts set telefoon = null where telefoon is not null and btrim(telefoon) = '';
+
+create unique index if not exists accounts_telefoon_key
+  on accounts (telefoon) where telefoon is not null;
+
+-- Heeft deze rol de onboarding na de betaling afgerond?
+alter table accounts add column if not exists koper_profiel_compleet boolean not null default false;
+alter table accounts add column if not exists verkoper_profiel_compleet boolean not null default false;
+
+-- Koper: waar zoekt iemand, voor hoeveel, en hoe serieus is het?
+alter table accounts add column if not exists zoekgebied text[];
+alter table accounts add column if not exists woningtype text[];
+alter table accounts add column if not exists budget_min numeric;
+alter table accounts add column if not exists budget_max numeric;
+alter table accounts add column if not exists koop_timing text;        -- nu / 1-3 / 3-6 / orienterend
+alter table accounts add column if not exists financiering text;       -- rond / in-gesprek / nog-niet
+alter table accounts add column if not exists eigen_woning_te_koop boolean;
+
+-- Verkoper: waarom, wanneer, en zoekt deze persoon zelf ook?
+alter table accounts add column if not exists verkoop_reden text;
+alter table accounts add column if not exists verkoop_termijn text;
+alter table accounts add column if not exists eerder_via_makelaar boolean;
+alter table accounts add column if not exists zoekt_zelf_woning boolean;
+alter table accounts add column if not exists eigendomsvorm text;
+
+-- De lange staart: alles wat we vragen maar (nog) niet als kolom nodig hebben.
+alter table accounts add column if not exists koper_profiel jsonb;
+alter table accounts add column if not exists verkoper_profiel jsonb;
+
+-- Toestemmingen — per doel apart, want dat is precies wat de AVG verlangt.
+-- Wat hier niet true staat, gebruiken we niet voor dat doel.
+alter table accounts add column if not exists toestemming jsonb not null default '{}'::jsonb;
+
+-- --------------------------------------------------------------------------
+-- 6. ZAKELIJK — nodig om een geldige btw-factuur te kunnen uitreiken.
+--    Bij een zakelijke afnemer moeten naam, adres en btw-nummer op de
+--    factuur; bij een buitenlandse zakelijke afnemer heb je het
+--    btw-identificatienummer nodig om de btw te mogen verleggen.
+-- --------------------------------------------------------------------------
+alter table accounts add column if not exists zakelijk boolean not null default false;
+alter table accounts add column if not exists bedrijfsnaam text;
+alter table accounts add column if not exists kvk_nummer text;
+alter table accounts add column if not exists btw_nummer text;
+alter table accounts add column if not exists rechtsvorm text;
+alter table accounts add column if not exists vestigingsadres text;
+alter table accounts add column if not exists factuur_adres text;
+alter table accounts add column if not exists factuur_email text;
+alter table accounts add column if not exists po_nummer text;
+alter table accounts add column if not exists functie text;
+
+-- --------------------------------------------------------------------------
+-- 7. BETAALGEGEVENS VAN MOLLIE — bij iDEAL/SEPA geeft Mollie de naam en het
+--    rekeningnummer van de betaler terug. De naam op de rekening is het
+--    sterkste signaal dat we hebben dat iemand is wie hij zegt te zijn;
+--    daar hebben we geen kopie van een identiteitsbewijs voor nodig.
+-- --------------------------------------------------------------------------
+alter table betalingen add column if not exists consumer_naam text;
+alter table betalingen add column if not exists consumer_iban text;
+alter table betalingen add column if not exists consumer_bic text;
+alter table betalingen add column if not exists telefoon text;
+
+-- --------------------------------------------------------------------------
+-- 8. Indexen & RLS
 -- --------------------------------------------------------------------------
 create index if not exists betalingen_ref_idx on betalingen (ref);
 create index if not exists betalingen_mollie_idx on betalingen (mollie_payment_id);

@@ -2481,3 +2481,20 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
 }
 .contact-paneel textarea:focus { outline: 2px solid var(--ultramarijn); outline-offset: -1px; }
 @media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr; gap: var(--s-24); } }
+
+/* --------------------------------------------------------------------------
+   Profielstap na de betaling — dit is geen formulier meer maar een
+   uitnodiging, dus het krijgt een eigen kaart onder de bevestiging.
+   -------------------------------------------------------------------------- */
+.profiel-stap {
+  margin-top: var(--s-32);
+  padding: var(--s-32);
+  background: var(--wit);
+  border: 1px solid var(--krijt);
+  border-radius: var(--radius-kaart);
+  box-shadow: var(--schaduw);
+}
+.profiel-stap h3 { margin: 0 0 var(--s-8); }
+.profiel-stap > p.grijs { margin: 0 0 var(--s-24); }
+.profiel-stap .veld { margin-bottom: var(--s-16); }
+.profiel-stap select { max-width: 360px; }

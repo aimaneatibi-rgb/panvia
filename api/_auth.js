@@ -71,6 +71,52 @@ function geldigEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
+/* ---- Telefoonnummers ---------------------------------------------------- */
+
+/* Het telefoonnummer is een tweede inlognaam. Daarvoor moet "06 12 34 56 78",
+   "06-12345678" en "+31 6 12345678" allemaal hetzelfde worden, anders logt
+   iemand niet in met het nummer dat hij zelf typte. We bewaren E.164:
+   +31612345678. Geeft null terug als er geen bruikbaar nummer in zit.
+
+   Nederland is de aanname bij een nummer dat met 0 begint; wie in het
+   buitenland woont (zie /buitenland) typt zelf een landcode. */
+function normaliseerTelefoon(telefoon) {
+  let t = String(telefoon || "").trim();
+  if (!t) return null;
+
+  const plus = t.charAt(0) === "+";
+  t = t.replace(/[^0-9]/g, "");
+  if (!t) return null;
+
+  if (plus) t = "+" + t;
+  else if (t.indexOf("00") === 0) t = "+" + t.slice(2);
+  else if (t.charAt(0) === "0") t = "+31" + t.slice(1);
+  /* Negen cijfers zonder nul ervoor is een Nederlands nummer waarbij de 0
+     is weggelaten (612345678). Zonder deze regel wordt dat "+6…", en dat
+     is geen bestaande landcode. */
+  else if (t.length === 9) t = "+31" + t;
+  else t = "+" + t;
+
+  /* E.164: landcode + abonneenummer, samen hooguit 15 cijfers. Onder de 8
+     is het geen telefoonnummer maar een typfout. */
+  const cijfers = t.slice(1);
+  if (cijfers.length < 8 || cijfers.length > 15) return null;
+  return t;
+}
+
+function geldigTelefoon(telefoon) {
+  return normaliseerTelefoon(telefoon) !== null;
+}
+
+/* Is dit een e-mailadres of een telefoonnummer? Bepaalt waarop we het
+   account opzoeken bij het inloggen. */
+function inlogSoort(waarde) {
+  const w = String(waarde || "").trim();
+  if (w.indexOf("@") !== -1) return "email";
+  if (/[0-9]/.test(w)) return "telefoon";
+  return null;
+}
+
 /* ---- Tokens ------------------------------------------------------------- */
 
 function nieuwToken() {
@@ -168,9 +214,17 @@ function publiekAccount(a) {
   return {
     naam: a.naam || "",
     email: a.email,
+    telefoon: a.telefoon || "",
+    zakelijk: !!a.zakelijk,
+    bedrijfsnaam: a.bedrijfsnaam || "",
     rollen: {
       koper: !!a.koper_actief,
       verkoper: !!a.verkoper_actief
+    },
+    /* Stuurt de onboarding: is het profiel voor deze rol al ingevuld? */
+    profielCompleet: {
+      koper: !!a.koper_profiel_compleet,
+      verkoper: !!a.verkoper_profiel_compleet
     }
   };
 }
@@ -179,6 +233,7 @@ module.exports = {
   COOKIE, SESSIE_DAGEN, RESET_MINUTEN,
   hashWachtwoord, controleerWachtwoord, keurWachtwoord,
   normaliseerEmail, geldigEmail,
+  normaliseerTelefoon, geldigTelefoon, inlogSoort,
   nieuwToken, hashToken,
   leesCookie, zetCookie, wisCookie,
   startSessie, huidigAccount, stopSessie,

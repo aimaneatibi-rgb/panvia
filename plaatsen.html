@@ -109,8 +109,44 @@
             </div>
 
             <div class="veld">
-              <label for="veld-vk-telefoon">Je telefoonnummer <span class="optioneel">(optioneel)</span></label>
-              <input type="tel" id="veld-vk-telefoon" autocomplete="tel" style="max-width: 240px;">
+              <label for="veld-vk-telefoon">Je telefoonnummer</label>
+              <input type="tel" id="veld-vk-telefoon" autocomplete="tel" inputmode="tel" style="max-width: 240px;">
+              <span class="hint">Je kunt hiermee ook inloggen. Kopers zien je nummer pas als je het zelf deelt.</span>
+              <p class="fout" role="alert"></p>
+            </div>
+
+            <fieldset>
+              <legend>Verkoop je als particulier of vanuit een bedrijf?</legend>
+              <div class="radio-rij">
+                <label class="radio-optie"><input type="radio" name="vk-hoedanigheid" value="particulier" checked> Particulier</label>
+                <label class="radio-optie"><input type="radio" name="vk-hoedanigheid" value="zakelijk"> Vanuit een bedrijf</label>
+              </div>
+              <span class="hint">Vanuit een bedrijf krijg je een factuur op naam van de organisatie, met btw.</span>
+            </fieldset>
+
+            <div id="vk-zakelijk" hidden>
+              <div class="veld">
+                <label for="veld-vk-bedrijf">Bedrijfsnaam</label>
+                <input type="text" id="veld-vk-bedrijf" autocomplete="organization">
+                <p class="fout" role="alert"></p>
+              </div>
+              <div class="veld-rij">
+                <div class="veld">
+                  <label for="veld-vk-kvk">KvK-nummer</label>
+                  <input type="text" id="veld-vk-kvk" inputmode="numeric" autocomplete="off">
+                  <p class="fout" role="alert"></p>
+                </div>
+                <div class="veld">
+                  <label for="veld-vk-btw">Btw-identificatienummer</label>
+                  <input type="text" id="veld-vk-btw" autocomplete="off" placeholder="NL123456789B01">
+                  <p class="fout" role="alert"></p>
+                </div>
+              </div>
+              <div class="veld">
+                <label for="veld-vk-factuur-email">E-mailadres voor facturen <span class="optioneel">(optioneel)</span></label>
+                <input type="email" id="veld-vk-factuur-email" autocomplete="email">
+                <span class="hint">Laat leeg als de factuur naar je eigen e-mailadres mag.</span>
+              </div>
             </div>
             <div class="veld">
               <label class="akkoord" for="veld-verklaring">

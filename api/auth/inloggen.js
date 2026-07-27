@@ -1,9 +1,11 @@
 /* ==========================================================================
    POST /api/auth/inloggen
-   Body: { email, wachtwoord }
+   Body: { inlog, wachtwoord }   (inlog = e-mailadres óf telefoonnummer)
+
+   Body.email blijft werken voor oudere pagina's.
 
    Bij succes: HttpOnly-sessiecookie + het publieke account.
-   Bij mislukking: altijd dezelfde melding, of het e-mailadres nu bestaat of
+   Bij mislukking: altijd dezelfde melding, of het account nu bestaat of
    niet. Anders is dit endpoint een gratis lijst van wie er klant is.
    ========================================================================== */
 
@@ -11,8 +13,8 @@
 
 const { db, fout } = require("../_lib");
 const {
-  normaliseerEmail, geldigEmail, controleerWachtwoord,
-  startSessie, publiekAccount
+  normaliseerEmail, geldigEmail, normaliseerTelefoon, inlogSoort,
+  controleerWachtwoord, startSessie, publiekAccount
 } = require("../_auth");
 
 const MAX_POGINGEN = 8;
@@ -25,16 +27,28 @@ module.exports = async function (req, res) {
   let body = req.body || {};
   if (typeof body === "string") { try { body = JSON.parse(body); } catch (e) { body = {}; } }
 
-  const email = normaliseerEmail(body.email);
+  const invoer = String(body.inlog || body.email || "").trim();
   const wachtwoord = String(body.wachtwoord || "");
-  if (!geldigEmail(email) || !wachtwoord) {
-    return fout(res, 400, "Vul je e-mailadres en wachtwoord in.");
+  const soort = inlogSoort(invoer);
+
+  /* Op e-mail óf op telefoonnummer — wat de bezoeker ook intypt. */
+  let zoekPad = null;
+  if (soort === "email") {
+    const email = normaliseerEmail(invoer);
+    if (geldigEmail(email)) zoekPad = "/accounts?email=eq." + encodeURIComponent(email) + "&select=*";
+  } else if (soort === "telefoon") {
+    const telefoon = normaliseerTelefoon(invoer);
+    if (telefoon) zoekPad = "/accounts?telefoon=eq." + encodeURIComponent(telefoon) + "&select=*";
   }
 
-  const afgewezen = "E-mailadres of wachtwoord klopt niet.";
+  if (!zoekPad || !wachtwoord) {
+    return fout(res, 400, "Vul je e-mailadres of telefoonnummer en je wachtwoord in.");
+  }
+
+  const afgewezen = "Deze gegevens kloppen niet. Controleer je e-mailadres of telefoonnummer en je wachtwoord.";
 
   try {
-    const rijen = await db("/accounts?email=eq." + encodeURIComponent(email) + "&select=*");
+    const rijen = await db(zoekPad);
     const account = rijen && rijen[0];
 
     /* Onbekend adres, of een account dat nog nooit een wachtwoord kreeg

@@ -16,6 +16,31 @@
 
 const { mollie, db, fout, baseUrl } = require("../_lib");
 
+/* Zakelijke gegevens uit het formulier (bewaard in betalingen.metadata) naar
+   het account tillen. Zonder deze velden kunnen we geen geldige btw-factuur
+   uitreiken, dus ze horen op het account en niet alleen in een JSON-blob. */
+function zakelijkeVelden(rij) {
+  const g = rij.metadata;
+  if (!g || typeof g !== "object" || !g.zakelijk) return {};
+  const uit = { zakelijk: true };
+  const paren = {
+    bedrijfsnaam: "bedrijfsnaam",
+    kvk_nummer: "kvk",
+    btw_nummer: "btw",
+    rechtsvorm: "rechtsvorm",
+    vestigingsadres: "vestigingsadres",
+    factuur_adres: "factuurAdres",
+    factuur_email: "factuurEmail",
+    po_nummer: "poNummer",
+    functie: "functie"
+  };
+  Object.keys(paren).forEach(function (kolom) {
+    const waarde = g[paren[kolom]];
+    if (waarde) uit[kolom] = String(waarde).slice(0, 300);
+  });
+  return uit;
+}
+
 module.exports = async function (req, res) {
   if (req.method !== "POST") return fout(res, 405, "Alleen POST.");
 
@@ -40,10 +65,20 @@ module.exports = async function (req, res) {
       return res.status(200).json({ ok: true });
     }
 
+    /* Wie heeft er betaald? Bij iDEAL en SEPA geeft Mollie de tenaamstelling
+       en het rekeningnummer terug; bij creditcard alleen de kaarthouder. De
+       naam op de rekening is ons sterkste identiteitssignaal — daarvoor
+       hoeven we geen kopie van een identiteitsbewijs te bewaren. */
+    const d = betaling.details || {};
+    const bijwerking = { status: status, updated_at: new Date().toISOString() };
+    if (d.consumerName || d.cardHolder) bijwerking.consumer_naam = d.consumerName || d.cardHolder;
+    if (d.consumerAccount) bijwerking.consumer_iban = d.consumerAccount;
+    if (d.consumerBic) bijwerking.consumer_bic = d.consumerBic;
+
     await db("/betalingen?id=eq." + rij.id, {
       method: "PATCH",
       prefer: "return=minimal",
-      body: { status: status, updated_at: new Date().toISOString() }
+      body: bijwerking
     });
 
     if (status === "paid") {
@@ -67,16 +102,18 @@ module.exports = async function (req, res) {
           body: Object.assign({
             email: rij.email,
             naam: rij.naam,
+            telefoon: rij.telefoon,    /* tweede inlognaam */
             wachtwoord_hash: rij.wachtwoord_hash,
             soort: rij.soort,          /* legacy-kolom, voor oude rapportages */
             betaald: true,             /* legacy-kolom */
             mollie_customer_id: rij.mollie_customer_id
-          }, { [rolVeld]: true, [sindsVeld]: nu })
+          }, { [rolVeld]: true, [sindsVeld]: nu }, zakelijkeVelden(rij))
         });
       } else {
-        const wijziging = Object.assign({ betaald: true }, { [rolVeld]: true });
+        const wijziging = Object.assign({ betaald: true }, { [rolVeld]: true }, zakelijkeVelden(rij));
         if (!account[sindsVeld]) wijziging[sindsVeld] = nu;
         if (!account.naam && rij.naam) wijziging.naam = rij.naam;
+        if (!account.telefoon && rij.telefoon) wijziging.telefoon = rij.telefoon;
         if (!account.wachtwoord_hash && rij.wachtwoord_hash) wijziging.wachtwoord_hash = rij.wachtwoord_hash;
         if (!account.mollie_customer_id && rij.mollie_customer_id) wijziging.mollie_customer_id = rij.mollie_customer_id;
         await db("/accounts?id=eq." + account.id, {

@@ -26,7 +26,8 @@
 
 const { TARIEVEN, baseUrl, mollie, db, fout } = require("../_lib");
 const {
-  huidigAccount, normaliseerEmail, geldigEmail, keurWachtwoord, hashWachtwoord
+  huidigAccount, normaliseerEmail, geldigEmail, keurWachtwoord, hashWachtwoord,
+  normaliseerTelefoon
 } = require("../_auth");
 const crypto = require("crypto");
 
@@ -48,7 +49,15 @@ module.exports = async function (req, res) {
     /* ---- 1. Wie is dit? ------------------------------------------------- */
     const ingelogd = await huidigAccount(req);
 
-    let naam, email, wachtwoordHash = null;
+    let naam, email, telefoon, wachtwoordHash = null;
+
+    /* Telefoon is verplicht en is tegelijk een tweede inlognaam. Wie al
+       ingelogd is en al een nummer heeft, hoeft het niet opnieuw te geven. */
+    telefoon = normaliseerTelefoon(body.telefoon);
+    if (!telefoon && ingelogd && ingelogd.telefoon) telefoon = ingelogd.telefoon;
+    if (!telefoon) {
+      return fout(res, 400, "Vul een geldig telefoonnummer in, bijvoorbeeld 06 12345678.");
+    }
 
     if (ingelogd) {
       email = ingelogd.email;
@@ -70,6 +79,20 @@ module.exports = async function (req, res) {
           code: "inloggen",
           fout: "Je hebt al een Panvia-account met dit e-mailadres. Log even in, dan gaat de rest vanzelf."
         });
+      }
+
+      /* Hetzelfde nummer bij een ánder account: dat mag niet, want dan is het
+         als inlognaam niet meer eenduidig. */
+      const opNummer = await db("/accounts?telefoon=eq." + encodeURIComponent(telefoon) + "&select=id,email,wachtwoord_hash");
+      if (opNummer && opNummer[0]) {
+        if (opNummer[0].wachtwoord_hash) {
+          return res.status(409).json({
+            ok: false,
+            code: "inloggen",
+            fout: "Dit telefoonnummer hoort al bij een Panvia-account. Log even in, dan gaat de rest vanzelf."
+          });
+        }
+        return fout(res, 409, "Dit telefoonnummer is al bij ons bekend. Mail ons even op hallo@panvia.nl, dan zetten we het recht.");
       }
 
       const bezwaar = keurWachtwoord(body.wachtwoord);
@@ -124,6 +147,7 @@ module.exports = async function (req, res) {
           soort: soort,
           naam: naam,
           email: email,
+          telefoon: telefoon,
           bedrag: Number(tarief.value),
           status: betaling.status || "open",
           wachtwoord_hash: wachtwoordHash,
