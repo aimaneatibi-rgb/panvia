@@ -126,27 +126,34 @@ module.exports = async function (req, res) {
       /* 3. Abonnement starten (één keer, idempotent).
          Koper: € 12,95 per maand, ingang volgende maand.
          Project (S/M/L): kwartaalbedrag, ingang volgend kwartaal — de
-         eerste betaling dekt kwartaal 1. Opzeggen = subscription cancelen. */
+         eerste betaling dekt kwartaal 1. Opzeggen = subscription cancelen.
+         Verkoper in termijnen: vast aantal termijnen (times) — de eerste
+         betaling dekt termijn 1, het abonnement de rest; daarna stopt het
+         vanzelf. Bij verkoop vóór het einde int api/mollie/verkocht het
+         restant tot € 895 excl en wordt het abonnement gecanceld. */
       const ABON = {
         koper:     { value: "12.95",    interval: "1 month",  maanden: 1, oms: "Panvia kopersabonnement" },
         project_s: { value: "5021.50",  interval: "3 months", maanden: 3, oms: "Panvia Project S — per kwartaal (€ 4.150 + 21% btw)" },
         project_m: { value: "8409.50",  interval: "3 months", maanden: 3, oms: "Panvia Project M — per kwartaal (€ 6.950 + 21% btw)" },
-        project_l: { value: "12644.50", interval: "3 months", maanden: 3, oms: "Panvia Project L — per kwartaal (€ 10.450 + 21% btw)" }
+        project_l: { value: "12644.50", interval: "3 months", maanden: 3, oms: "Panvia Project L — per kwartaal (€ 10.450 + 21% btw)" },
+        verkoper_week:   { value: "45.38",  interval: "1 week",  dagen: 7,  times: 23, oms: "Panvia plaatsing — weektermijn (€ 37,50 + 21% btw)" },
+        verkoper_4weken: { value: "181.50", interval: "4 weeks", dagen: 28, times: 5,  oms: "Panvia plaatsing — 4-wekentermijn (€ 150 + 21% btw)" }
       };
       const abonSpec = ABON[rij.soort];
       if (abonSpec && rij.mollie_customer_id && !rij.mollie_subscription_id) {
         const start = new Date();
-        start.setMonth(start.getMonth() + abonSpec.maanden);
+        if (abonSpec.dagen) start.setDate(start.getDate() + abonSpec.dagen);
+        else start.setMonth(start.getMonth() + abonSpec.maanden);
         const startDatum = start.toISOString().slice(0, 10);
         const abo = await mollie("/customers/" + rij.mollie_customer_id + "/subscriptions", {
           method: "POST",
-          body: {
+          body: Object.assign({
             amount: { currency: "EUR", value: abonSpec.value },
             interval: abonSpec.interval,
             startDate: startDatum,
             description: abonSpec.oms,
             webhookUrl: baseUrl(req) + "/api/mollie/webhook"
-          }
+          }, abonSpec.times ? { times: abonSpec.times } : {})
         });
         await db("/betalingen?id=eq." + rij.id, {
           method: "PATCH",

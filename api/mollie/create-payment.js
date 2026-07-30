@@ -38,12 +38,14 @@ module.exports = async function (req, res) {
   let body = req.body || {};
   if (typeof body === "string") { try { body = JSON.parse(body); } catch (e) { body = {}; } }
 
-  const GELDIGE_SOORTEN = ["verkoper", "koper", "project_s", "project_m", "project_l"];
+  const GELDIGE_SOORTEN = ["verkoper", "verkoper_week", "verkoper_4weken", "koper", "project_s", "project_m", "project_l"];
   const soort = GELDIGE_SOORTEN.indexOf(body.soort) !== -1 ? body.soort : null;
   if (!soort) return fout(res, 400, "Ongeldige soort.");
-  /* Koper én projecten zijn terugkerend: eerste betaling vestigt een
-     Mollie-mandaat, de webhook start daarna het abonnement. */
-  const terugkerend = soort === "koper" || soort.indexOf("project_") === 0;
+  /* Koper, projecten én verkopers-in-termijnen zijn terugkerend: eerste
+     betaling vestigt een Mollie-mandaat, de webhook start daarna het
+     abonnement. */
+  const terugkerend = soort === "koper" || soort.indexOf("project_") === 0 ||
+    soort === "verkoper_week" || soort === "verkoper_4weken";
 
   try {
     /* ---- 1. Wie is dit? ------------------------------------------------- */

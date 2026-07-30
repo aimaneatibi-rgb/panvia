@@ -33,7 +33,8 @@ create table if not exists betalingen (
 -- bij en liepen daardoor stuk op de oude check.
 alter table betalingen drop constraint if exists betalingen_soort_check;
 alter table betalingen add constraint betalingen_soort_check
-  check (soort in ('koper', 'verkoper', 'project_s', 'project_m', 'project_l'));
+  check (soort in ('koper', 'verkoper', 'verkoper_week', 'verkoper_4weken',
+                   'verkoper_aanvulling', 'project_s', 'project_m', 'project_l'));
 
 -- Het wachtwoord dat de bezoeker vóór de betaling koos, meteen gehasht
 -- (scrypt). De klaartekst raakt de database nooit. De webhook zet deze hash

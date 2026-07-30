@@ -16,7 +16,15 @@ const TARIEVEN = {
   koper:    { value: "12.95",   omschrijving: "Panvia kopersabonnement — eerste maand" },
   /* € 895 excl. btw + 21% = € 1.082,95 — de advertentieprijs is exclusief,
      de afrekening bij Mollie is het totaal inclusief btw. */
-  verkoper: { value: "1082.95", omschrijving: "Panvia plaatsing — 6 maanden online (€ 895 + 21% btw)" },
+  verkoper: { value: "1082.95", omschrijving: "Panvia plaatsing — 24 weken online (€ 895 + 21% btw)" },
+  /* Betaalspreiding: dezelfde plaatsing van 24 weken, in termijnen. Week
+     € 37,50 excl (24×), 4 weken € 150 excl (6×) — samen € 900 excl, dus € 5
+     boven het ineens-tarief. Eerste betaling vestigt het mandaat; de webhook
+     start het abonnement met een vast aantal termijnen (times). Wordt het
+     pand eerder verkocht, dan int api/mollie/verkocht het restant tot € 895
+     excl via het mandaat. */
+  verkoper_week:   { value: "45.38",  omschrijving: "Panvia plaatsing — weektermijn (€ 37,50 + 21% btw)" },
+  verkoper_4weken: { value: "181.50", omschrijving: "Panvia plaatsing — 4-wekentermijn (€ 150 + 21% btw)" },
   /* Projectpakketten: prijs per kwartaal excl. btw (4.150/6.950/10.450),
      afgerekend incl. 21% btw. Eerste betaling vestigt het mandaat; de
      webhook start daarna het kwartaalabonnement (interval 3 months). */

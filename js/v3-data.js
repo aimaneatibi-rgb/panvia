@@ -54,7 +54,7 @@ var PANVIA_GIDSEN = [
       { kop: "3 · Schrijf een eerlijke tekst",
         tekst: "Jij kent dit huis beter dan welke makelaar ook. Schrijf wat een koper wil weten: wat er vernieuwd is (met jaartal), de maandlasten, hoe de buurt is om acht uur in de ochtend. Noem ook wat minder is — wie een gebrek zelf meldt, wint vertrouwen en voorkomt gedoe bij de overdracht. Je meldplicht als verkoper bestaat echt; verzwijgen komt terug via de notaris of de rechter." },
       { kop: "4 · Plaats je pand",
-        tekst: "Op Panvia betaal je <strong>€ 895</strong> voor zes maanden, exclusief btw. Je advertentie staat binnen een dag online. Kopers die je berichten of een bod doen hebben een kopersabonnement — dus wie schrijft, is serieus." },
+        tekst: "Op Panvia betaal je <strong>€ 895</strong> voor 24 weken, exclusief btw. Je advertentie staat binnen een dag online. Kopers die je berichten of een bod doen hebben een kopersabonnement — dus wie schrijft, is serieus." },
       { kop: "5 · Bezichtigen doe je zelf — en dat is een voordeel",
         tekst: "Niemand beantwoordt vragen over dit huis beter dan jij. Plan bezichtigingen achter elkaar (dat scheelt avonden en het geeft vaart), loop een vaste route, en laat mensen even alleen in een ruimte — dat is het moment waarop ze zich er iets bij voorstellen." },
       { kop: "6 · Onderhandelen zonder toneelstuk",
@@ -118,7 +118,7 @@ var PANVIA_GIDSEN = [
     foto: "/img/gids-zakelijk.webp",
     secties: [
       { kop: "Jij kent je koper vaak al",
-        tekst: "De meeste zakelijke transacties beginnen in het eigen netwerk: de huurder die wil kopen, de belegger uit een eerdere deal, de buurman die wil uitbreiden. Een bedrijfsmakelaar inhuren om zichtbaar te zijn terwijl je de koper al kent — dat is precies de kostenpost die je hier overslaat. Een vaste prijs: <strong>€ 895</strong> per pand, zes maanden." },
+        tekst: "De meeste zakelijke transacties beginnen in het eigen netwerk: de huurder die wil kopen, de belegger uit een eerdere deal, de buurman die wil uitbreiden. Een bedrijfsmakelaar inhuren om zichtbaar te zijn terwijl je de koper al kent — dat is precies de kostenpost die je hier overslaat. Een vaste prijs: <strong>€ 895</strong> per pand, 24 weken." },
       { kop: "Zet de cijfers voorop",
         tekst: "Zakelijke kopers rekenen: huurstroom, resterende looptijd, BAR, servicekosten, energielabel (let op de label-C-plicht voor kantoren). Zet die cijfers gewoon in je advertentie. Een zakelijke koper die moet mailen voor een huuroverzicht, is al half afgehaakt." },
       { kop: "Tien eenheden of meer? Dat is een project",

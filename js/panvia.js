@@ -2015,11 +2015,16 @@
     }
 
     function klaarVerkoper(d) {
+      var betaalRegel = d.soort === "verkoper_week"
+        ? "Je betaalde de eerste weektermijn van € 45,38 (€ 37,50 + 21% btw). De volgende 23 termijnen worden wekelijks automatisch geïncasseerd — verkoop je eerder, dan rekenen we eenmalig het restant tot € 895 excl. btw af, nooit meer dan dat."
+        : d.soort === "verkoper_4weken"
+        ? "Je betaalde de eerste 4-wekentermijn van € 181,50 (€ 150 + 21% btw). De volgende 5 termijnen worden per 4 weken automatisch geïncasseerd — verkoop je eerder, dan rekenen we eenmalig het restant tot € 895 excl. btw af, nooit meer dan dat."
+        : "Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 24 weken.";
       blok.innerHTML =
         "<div class='bevestiging'>" +
           "<div class='vink' aria-hidden='true'>✓</div>" +
           "<h2>Betaald. Je pand staat klaar.</h2>" +
-          "<p class='grijs'>Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 6 maanden. We controleren je advertentie en zetten hem daarna online — je hoort van ons op " + escapeHTML(d.email || "je e-mailadres") + ". Geen courtage erachteraan, ook niet als je pand verkoopt.</p>" +
+          "<p class='grijs'>" + betaalRegel + " We controleren je advertentie en zetten hem daarna online — je hoort van ons op " + escapeHTML(d.email || "je e-mailadres") + ". Geen courtage erachteraan, ook niet als je pand verkoopt.</p>" +
           inlogRegel(d) +
         "</div>" +
         "<div id='na-betaling'></div>";
@@ -2075,7 +2080,7 @@
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (!d || !d.ok) throw new Error(d && d.fout ? d.fout : "status onbekend");
-          if (d.status === "paid") return d.soort === "verkoper" ? klaarVerkoper(d) : (PROJECT_BEDRAG[d.soort] ? klaarProject(d) : klaarKoper(d));
+          if (d.status === "paid") return (d.soort && d.soort.indexOf("verkoper") === 0) ? klaarVerkoper(d) : (PROJECT_BEDRAG[d.soort] ? klaarProject(d) : klaarKoper(d));
           if (d.status === "open" || d.status === "pending" || d.status === "authorized") {
             if (pogingen++ < 10) return setTimeout(check, 2000);
             return nogBezig();
@@ -2522,7 +2527,7 @@
             "<div class='vink' aria-hidden='true'>✓</div>" +
             "<h2>Voor minder dan tien eenheden plaats je per pand</h2>" +
             "<p class='grijs'>Projectpakketten beginnen bij tien eenheden. Met <span class='tnum'>" + n + "</span> " +
-            (n === 1 ? "eenheid" : "eenheden") + " ben je voordeliger uit met losse plaatsingen van <span class='tnum'>€ 895</span> per pand (excl. btw, 6 maanden).</p>" +
+            (n === 1 ? "eenheid" : "eenheden") + " ben je voordeliger uit met losse plaatsingen van <span class='tnum'>€ 895</span> per pand (excl. btw, 24 weken).</p>" +
             "<p style='margin-top:24px'><a class='btn btn-primair' href='/plaatsen'>Plaats je pand</a></p>" +
           "</div>";
         window.scrollTo({ top: $("#aanmelden").offsetTop - 40, behavior: "smooth" });
@@ -2718,6 +2723,53 @@
       if (kopUitleg && kopUitleg.tagName === "P") kopUitleg.hidden = true;
       return;
     }
+
+    /* Plaatsing afronden: verkocht (bij termijnen wordt het restant tot
+       € 895 excl. btw eenmalig afgerekend via het mandaat) of stoppen
+       zonder verkoop (alleen de incasso stopt). Server: api/mollie/verkocht. */
+    var afronden = document.createElement("div");
+    afronden.className = "nb-blok";
+    afronden.style.cssText = "margin: 0 0 24px;";
+    afronden.innerHTML =
+      "<p style='margin:0 0 12px'><strong>Pand verkocht?</strong> Gefeliciteerd — meld het hier, dan gaat je advertentie offline. " +
+      "Betaal je in termijnen, dan rekenen we eenmalig het restant tot <span class='tnum'>€ 895</span> excl. btw af en stopt de incasso. " +
+      "Stoppen zonder verkoop kan ook — dan stopt alleen het betalen.</p>" +
+      "<p style='margin:0'><button type='button' class='btn btn-secundair' id='eig-verkocht'>Pand verkocht</button> " +
+      "<button type='button' class='btn btn-tertiair' id='eig-stoppen'>Plaatsing stoppen</button></p>" +
+      "<p class='klein grijs' id='eig-afronden-status' style='margin:8px 0 0'></p>";
+    lijst.parentNode.insertBefore(afronden, lijst);
+    function rondPlaatsingAf(actie) {
+      var status = $("#eig-afronden-status", afronden);
+      var vraag = actie === "verkocht"
+        ? "Pand verkocht melden? Je advertentie gaat offline. Betaal je in termijnen, dan wordt het restant tot € 895 excl. btw eenmalig geïncasseerd."
+        : "Plaatsing stoppen? Je advertentie gaat offline en de termijnbetaling stopt.";
+      if (!window.confirm(vraag)) return;
+      if (betaalModus() !== "mollie") {
+        status.textContent = "(Prototype) Geregeld — op de echte site verwerken we dit via Mollie.";
+        return;
+      }
+      status.textContent = "Bezig…";
+      fetch("/api/mollie/verkocht", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actie: actie })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (d && d.ok) {
+          status.textContent = actie === "verkocht"
+            ? (d.restantIncl
+                ? "Geregeld — het restant van € " + d.restantIncl.toFixed(2).replace(".", ",") + " incl. btw wordt geïncasseerd en je advertentie gaat offline. Gefeliciteerd met de verkoop!"
+                : "Geregeld — je advertentie gaat offline. Gefeliciteerd met de verkoop!")
+            : "Geregeld — de termijnbetaling is gestopt en je advertentie gaat offline.";
+        } else {
+          status.textContent = (d && d.fout) || "Dat lukte niet — probeer het opnieuw of mail hallo@panvia.nl.";
+        }
+      }).catch(function () {
+        status.textContent = "Dat lukte niet — probeer het opnieuw of mail hallo@panvia.nl.";
+      });
+    }
+    $("#eig-verkocht", afronden).addEventListener("click", function () { rondPlaatsingAf("verkocht"); });
+    $("#eig-stoppen", afronden).addEventListener("click", function () { rondPlaatsingAf("stoppen"); });
 
     var pand = vindPand("w2");
     var basisKey = "panvia-chat-w2";
@@ -3069,7 +3121,7 @@
         prijsPreview.innerHTML =
           fmtPrijs(n) + " <span class='grijs'>" + $("#veld-kk").value + "</span>" +
           "<span class='grijs' style='display:block'>Ter vergelijking: 1,5% courtage zou hier " +
-          fmtPrijs(courtage) + " incl. btw kosten. Op Panvia betaal je " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden.</span>";
+          fmtPrijs(courtage) + " incl. btw kosten. Op Panvia betaal je " + fmtPrijs(PANVIA_FEE) + " voor 24 weken.</span>";
       } else {
         prijsPreview.textContent = "";
       }
@@ -3117,7 +3169,7 @@
         ["Energielabel", gegevens.energielabel],
         ["Foto’s", gegevens.fotos.length ? gegevens.fotos.length + " gekozen" : "Nog geen — kan later"],
         ["Vraagprijs", fmtPrijs(gegevens.vraagprijs) + " " + gegevens.kk],
-        ["Plaatsingsfee", fmtPrijs(PANVIA_FEE) + " excl. btw · afrekening € 1.082,95 incl. 21% btw, voor 6 maanden"]
+        ["Plaatsingsfee", fmtPrijs(PANVIA_FEE) + " excl. btw voor 24 weken — in één keer of in termijnen, kies je hieronder"]
       ];
       $("#overzicht-body").innerHTML = rijen.map(function (r) {
         return "<tr><th scope='row'>" + r[0] + "</th><td class='tnum'>" + r[1] + "</td></tr>";
@@ -3145,8 +3197,26 @@
        mollieVerwerk); de plaatsing/het verkoperaccount wordt PAS afgerond
        nadat de betaling is geslaagd. In lanceringsmodus (wachtlijst) betaalt
        de verkoper nog niets. */
+    /* Betaalritme: dezelfde plaatsing van 24 weken, in één keer of in
+       termijnen (spreiding, geen korting — bij verkoop vóór het einde wordt
+       het restant tot € 895 excl. btw afgerekend, zie api/mollie/verkocht). */
+    var RITMES = {
+      verkoper:        { bedrag: "€ 1.082,95", periode: "24 weken online — € 895 + 21% btw", knop: "Betaal € 1.082,95" },
+      verkoper_4weken: { bedrag: "€ 181,50",  periode: "eerste 4-wekentermijn — € 150 + 21% btw, 6 termijnen", knop: "Betaal € 181,50 per 4 weken" },
+      verkoper_week:   { bedrag: "€ 45,38",   periode: "eerste weektermijn — € 37,50 + 21% btw, 24 termijnen", knop: "Betaal € 45,38 per week" }
+    };
+    function gekozenRitme() {
+      var r = $("input[name='betaalritme']:checked");
+      return r && RITMES[r.value] ? r.value : "verkoper";
+    }
+
     var betaalKnop = $("#betaal-knop");
     if (betaalKnop) {
+      $all("input[name='betaalritme']").forEach(function (r) {
+        r.addEventListener("change", function () {
+          betaalKnop.textContent = RITMES[gekozenRitme()].knop;
+        });
+      });
       betaalKnop.addEventListener("click", function () {
         var paneel = $("#formulier-paneel");
         var indicator = $("#stap-indicator");
@@ -3193,16 +3263,19 @@
               "voor de lancering. We controleren je gegevens, nemen binnen twee werkdagen contact op via " +
               (gegevens.verkoper ? gegevens.verkoper.email : "je e-mailadres") + ", en zetten je pand online " +
               (cfg("lanceringsDatumTekst", "") ? "zodra Panvia opengaat op " + cfg("lanceringsDatumTekst", "") : "zodra het platform opengaat") + ".</p>" +
-              "<p class='grijs'>Als eerste aanmelder plaats je je pand voor " + fmtPrijs(PANVIA_FEE) + " voor 6 maanden — " +
+              "<p class='grijs'>Als eerste aanmelder plaats je je pand voor " + fmtPrijs(PANVIA_FEE) + " voor 24 weken — " +
               "en pas nadat je akkoord hebt gegeven. Geen courtage, geen succesfee.</p>" +
               "<p style='margin-top:24px'><a class='btn btn-secundair' href='/aanbod'>Bekijk het aanbod</a></p>" +
             "</div>"
           : "<div class='bevestiging'>" +
               "<div class='vink' aria-hidden='true'>✓</div>" +
               "<h2>Betaald. Je pand staat klaar.</h2>" +
-              "<p class='grijs'>Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 6 maanden. Geen courtage erachteraan — " +
+              "<p class='grijs'>" + (gekozenRitme() === "verkoper"
+                ? "Je betaalde € 1.082,95 (€ 895 + 21% btw) voor 24 weken."
+                : "Je betaalde de eerste termijn (" + RITMES[gekozenRitme()].bedrag + " incl. btw). De volgende termijnen worden automatisch geïncasseerd tot de 24 weken vol zijn — verkoop je eerder, dan rekenen we eenmalig het restant tot € 895 excl. btw af.") +
+              " Geen courtage erachteraan — " +
               "ook niet als je pand verkoopt. " + (gegevens.adres || "Je pand") + " gaat na een korte controle online " +
-              "en staat 6 maanden op Panvia. Kopers nemen rechtstreeks contact met je op.</p>" +
+              "en staat 24 weken op Panvia. Kopers nemen rechtstreeks contact met je op.</p>" +
               "<p class='grijs'>Wat wij nu doen: je advertentie controleren en publiceren. " +
               "Wat jij doet: praten met kopers en verkopen. Zo is het verdeeld.</p>" +
               "<p style='margin-top:24px'><a class='btn btn-secundair' href='/aanbod'>Bekijk het aanbod</a></p>" +
@@ -3221,7 +3294,7 @@
              webhook de betaling heeft bevestigd. */
           indicator.hidden = true;
           mollieStart(paneel, {
-            soort: "verkoper",
+            soort: gekozenRitme(),
             naam: gegevens.verkoper ? gegevens.verkoper.naam : "",
             email: gegevens.verkoper ? gegevens.verkoper.email : "",
             telefoon: gegevens.verkoper ? gegevens.verkoper.telefoon : "",
@@ -3248,11 +3321,11 @@
           /* Simulatie (localhost): het prototype-betaalscherm, daarna afronden. */
           indicator.hidden = true;
           mollieCheckout(paneel, {
-            bedrag: "€ 1.082,95",
-            periode: "6 maanden online — € 895 + 21% btw",
+            bedrag: RITMES[gekozenRitme()].bedrag,
+            periode: RITMES[gekozenRitme()].periode,
             omschrijving: "Panvia plaatsing",
-            knopLabel: "Betaal € 1.082,95",
-            klein: "Eenmalig — geen courtage, geen succesfee.",
+            knopLabel: RITMES[gekozenRitme()].knop,
+            klein: "Geen courtage, geen succesfee.",
             onTerug: function () {
               indicator.hidden = false;
               window.location.reload();
@@ -3451,7 +3524,7 @@
       var slot = $(".klein.grijs", betaalStap);
       if (slot) {
         slot.innerHTML = "<strong>Je betaalt vandaag niets.</strong> Plaatsen kost straks <span class='tnum'>" +
-          fmtPrijs(PANVIA_FEE) + "</span> excl. btw voor 6 maanden (afrekening € 1.082,95 incl. 21% btw) — pas nadat je akkoord geeft. Geen courtage, geen succesfee.";
+          fmtPrijs(PANVIA_FEE) + "</span> excl. btw voor 24 weken, in één keer of in termijnen (ineens: € 1.082,95 incl. 21% btw) — pas nadat je akkoord geeft. Geen courtage, geen succesfee.";
       }
     }
     /* Indicatorlabel meeveranderen */
