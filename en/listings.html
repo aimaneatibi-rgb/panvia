@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homes and property for sale by owner | Panvia</title>
+  <meta name="description" content="Homes and commercial property for sale, directly from the owner — no estate agent in between. In the Netherlands and beyond; you'll find what isn't listed anywhere else.">
+  <link rel="canonical" href="https://www.panvia.nl/en/listings">
+  <link rel="alternate" hreflang="nl" href="https://www.panvia.nl/aanbod">
+  <link rel="alternate" hreflang="en" href="https://www.panvia.nl/en/listings">
+  <link rel="alternate" hreflang="x-default" href="https://www.panvia.nl/aanbod">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Panvia">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://www.panvia.nl/en/listings">
+  <meta property="og:title" content="Homes and property for sale by owner | Panvia">
+  <meta property="og:description" content="Homes, commercial property and holiday homes, directly from the owner. No estate agent in between.">
+  <meta property="og:image" content="https://www.panvia.nl/img/og-panvia.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Panvia — Property in your own hands.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Homes and property for sale by owner | Panvia">
+  <meta name="twitter:description" content="Homes, commercial property and holiday homes, directly from the owner. No estate agent in between.">
+  <meta name="twitter:image" content="https://www.panvia.nl/img/og-panvia.png">
+  <meta name="theme-color" content="#2438D8">
+  <script src="/js/consent.js"></script>
+  <link rel="stylesheet" href="/css/fonts.css">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/panvia.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.panvia.nl/#organisatie","name":"Panvia","url":"https://www.panvia.nl/","logo":"https://www.panvia.nl/img/og-panvia.png","slogan":"Property in your own hands.","email":"hallo@panvia.nl"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.panvia.nl/en/"},{"@type":"ListItem","position":2,"name":"Listings","item":"https://www.panvia.nl/en/listings"}]}]}</script>
+</head>
+<body data-page="aanbod">
+  <a class="skip-link" href="#inhoud">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="merk" href="/en/">
+        <span class="woordmerk">Panvia</span>
+        <span class="merk-tagline">Property in your own hands.</span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+        <ul>
+          <li><a href="/en/listings" aria-current="page">Listings</a></li>
+          <li><a href="/en/abroad">Abroad</a></li>
+          <li><a href="/en/commercial">Commercial</a></li>
+          <li><a href="/en/projects">Projects</a></li>
+          <li><a href="/en/guides">Guides</a></li>
+          <li><a class="nav-cta" href="/en/list-your-property">List your property</a></li>
+          <li><a href="/aanbod" lang="nl" aria-label="Nederlandse versie">NL</a></li>
+          <li class="nav-account" id="nav-account"></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inhoud">
+    <section class="sectie-krap">
+      <div class="container">
+        <div class="sectie-kop" style="margin-bottom: 32px;">
+          <h1>Listings</h1>
+          <p class="body-l">Every property here was listed by the owner. When you get in touch, you're talking straight away to the person who can decide.</p>
+          <p class="klein" style="margin-top: 12px;">Looking for a place in the sun? Browse <a href="/en/abroad">all property abroad →</a></p>
+        </div>
+
+        <form class="filterbalk" aria-label="Filter the listings" onsubmit="return false;">
+          <div class="veld veld-zoek">
+            <label for="filter-zoek">Search</label>
+            <input type="search" id="filter-zoek" placeholder="Town, address or type…">
+          </div>
+          <div class="veld">
+            <label for="filter-type">Type</label>
+            <select id="filter-type">
+              <option value="">Everything</option>
+              <option value="woning">Home</option>
+              <option value="commercieel">Commercial property</option>
+              <option value="vakantie">Holiday home</option>
+            </select>
+          </div>
+          <div class="veld">
+            <label for="filter-land">Location</label>
+            <select id="filter-land">
+              <option value="">Anywhere</option>
+              <option value="Nederland">Netherlands</option>
+              <option value="Buitenland">Abroad</option>
+            </select>
+          </div>
+          <div class="veld">
+            <label for="filter-plaats">Town</label>
+            <select id="filter-plaats">
+              <option value="">All towns</option>
+            </select>
+          </div>
+          <div class="veld">
+            <label for="filter-prijs">Price</label>
+            <select id="filter-prijs" class="tnum">
+              <option value="">No maximum</option>
+              <option value="300000">Up to € 300,000</option>
+              <option value="500000">Up to € 500,000</option>
+              <option value="750000">Up to € 750,000</option>
+              <option value="1000000">Up to € 1,000,000</option>
+              <option value="1500000">Up to € 1,500,000</option>
+            </select>
+          </div>
+          <div class="veld">
+            <label for="filter-opp">Floor area</label>
+            <select id="filter-opp" class="tnum">
+              <option value="">Any floor area</option>
+              <option value="75">From 75 m²</option>
+              <option value="100">From 100 m²</option>
+              <option value="150">From 150 m²</option>
+              <option value="500">From 500 m²</option>
+              <option value="1000">From 1,000 m²</option>
+            </select>
+          </div>
+          <button type="button" id="wis-filters" class="btn btn-tertiair">Clear my filters</button>
+        </form>
+
+        <div class="resultaatbalk">
+          <p id="resultaat-teller" class="resultaat-teller" aria-live="polite"></p>
+          <div class="resultaat-acties">
+            <button type="button" id="toggle-kaart" class="chip chip-kaart" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4 L3 6 V20 L9 18 L15 20 L21 18 V4 L15 6 L9 4 Z M9 4 V18 M15 6 V20" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              Map
+            </button>
+            <button type="button" id="chip-bewaard" class="chip" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20.5 C7 16.5 3.5 13.4 3.5 9.6 A4.6 4.6 0 0 1 12 7.2 A4.6 4.6 0 0 1 20.5 9.6 C20.5 13.4 17 16.5 12 20.5 Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              Saved <span id="chip-bewaard-aantal" class="tnum"></span>
+            </button>
+            <label class="sorteer-label" for="sorteer">Sort</label>
+            <select id="sorteer">
+              <option value="">Relevance</option>
+              <option value="prijs-op">Price, low → high</option>
+              <option value="prijs-af">Price, high → low</option>
+              <option value="opp-af">Floor area, large → small</option>
+              <option value="nieuw">Year built, newest first</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="aanbod-splits" id="aanbod-splits">
+          <div class="aanbod-kaartkolom" id="kaart-kolom">
+            <div id="aanbod-kaart" role="application" aria-label="Map of the listings"></div>
+          </div>
+          <div class="aanbod-lijstkolom">
+            <div id="projecten-strip" class="projecten-strip" hidden></div>
+
+            <div id="aanbod-grid" class="kaarten-grid"></div>
+
+            <div id="leeg-melding" class="leeg-melding" hidden>
+              <h2>No properties match these filters</h2>
+              <p>Widen a filter or clear them all. New listings come straight from owners — not from agencies, so sometimes in waves.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sectie-krap">
+      <div class="container">
+        <div class="nb-blok" style="max-width: 720px;">
+          <p style="margin: 0;"><strong>Is your property not here yet?</strong> Listing costs <span class="tnum">€ 895</span> for 24 weeks, excl. VAT. No commission, no success fee. <a href="/en/list-your-property">List your property</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <span class="woordmerk">Panvia</span>
+          <span class="merk-tagline">Property in your own hands.</span>
+          <p class="klein" style="margin-top: 16px;">From owner to buyer. For homes and commercial property.</p>
+        </div>
+        <div>
+          <h3>Listings</h3>
+          <ul>
+            <li><a href="/en/listings">All listings</a></li>
+            <li><a href="/en/listings?type=woning">Homes</a></li>
+            <li><a href="/en/listings?type=commercieel">Commercial property</a></li>
+            <li><a href="/en/listings?type=vakantie">Holiday homes</a></li>
+            <li><a href="/en/abroad">Abroad</a></li>
+            <li><a href="/en/projects">Projects</a></li>
+            <li><a href="/en/commercial">Panvia Commercial</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Buying &amp; selling</h3>
+          <ul>
+            <li><a href="/en/buyers">For buyers</a></li>
+            <li><a href="/en/list-your-property">List your property</a></li>
+            <li><a href="/en/guides">Guides</a></li>
+            <li><a href="/en/projects">Panvia Projects</a></li>
+            <li><a href="/eigenaar">My Panvia</a></li>
+            <li><a href="/en/about">About us</a></li>
+            <li><a href="/en/rules">Rules</a></li>
+            <li><a href="/en/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>What we don't do</h3>
+          <p class="klein">We don't do valuations. We don't negotiate. We don't broker — not even mortgages. We never sell your data — to anyone, ever. Panvia provides information, not advice.</p>
+        </div>
+      </div>
+      <p class="footer-groot" aria-hidden="true">Panvia</p>
+      <div class="footer-onder">
+        <span>© 2026 Panvia · Built &amp; managed by <a href="https://kaelo-consulting.com" target="_blank" rel="noopener">Kaelo Consulting</a></span>
+        <span>Panvia is not an estate agent. · <a href="/en/cookies">Cookies</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/data.js"></script>
+  <script src="/js/v3-data.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="/js/panvia.js"></script>
+</body>
+</html>
