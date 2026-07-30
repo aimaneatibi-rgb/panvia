@@ -969,6 +969,8 @@
   function initGidsen() {
     var grid = $("#gidsen-grid");
     if (!grid || typeof PANVIA_GIDSEN === "undefined") return;
+    /* De kaarten staan als echte HTML in de pagina (SEO); alleen renderen als fallback. */
+    if (grid.children.length) return;
     grid.innerHTML = PANVIA_GIDSEN.map(gidsKaartHTML).join("");
   }
 
@@ -1187,7 +1189,7 @@
 
     /* Gidsen-teaser: de eerste drie gidsen */
     var teaser = $("#gidsen-teaser");
-    if (teaser && typeof PANVIA_GIDSEN !== "undefined") {
+    if (teaser && !teaser.children.length && typeof PANVIA_GIDSEN !== "undefined") {
       teaser.innerHTML = PANVIA_GIDSEN.slice(0, 3).map(gidsKaartHTML).join("");
     }
 
