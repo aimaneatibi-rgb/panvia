@@ -33,69 +33,97 @@
   <link rel="stylesheet" href="css/panvia.css">
   <link rel="preload" as="image" href="/img/hero.webp" fetchpriority="high">
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": "https://www.panvia.nl/#organisatie",
-        "name": "Panvia",
-        "url": "https://www.panvia.nl/",
-        "logo": "https://www.panvia.nl/img/og-panvia.png",
-        "slogan": "Vastgoed in eigen hand.",
-        "email": "hallo@panvia.nl",
-        "description": "Panvia is het platform waar eigenaren hun woning of bedrijfspand zelf verkopen, zonder makelaar en zonder courtage. Eén vast bedrag van € 895 voor 24 weken."
-      },
-      {
-        "@type": "WebSite",
-        "@id": "https://www.panvia.nl/#website",
-        "url": "https://www.panvia.nl/",
-        "name": "Panvia",
-        "inLanguage": "nl-NL",
-        "publisher": { "@id": "https://www.panvia.nl/#organisatie" }
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Mag ik mijn huis zonder makelaar verkopen?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Ja. Een makelaar is nergens verplicht. De notaris is dat wél — die regelt de leveringsakte en de overdracht. Verder heb je nodig: een energielabel, je eigen verhaal en de wil om zelf met kopers te praten." }
-          },
-          {
-            "@type": "Question",
-            "name": "Wat kost verkopen via Panvia?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Eén vast bedrag van € 895 exclusief btw per plaatsing van 24 weken. Liever spreiden? Dezelfde plaatsing kan ook per 4 weken (€ 150) of per week (€ 37,50), exclusief btw — verkoop je eerder, dan reken je eenmalig het restant tot € 895 af, nooit meer. Geen courtage, geen succesfee en geen verlenging zonder jouw akkoord. Ter vergelijking: een makelaar rekent doorgaans 1 à 2 procent van je verkoopprijs." }
-          },
-          {
-            "@type": "Question",
-            "name": "Wat kost Panvia voor kopers?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Zoeken en kijken is gratis. Wil je met een eigenaar praten of een bod doen, dan neem je een kopersabonnement van € 12,95 per maand — geldig voor alle panden en maandelijks opzegbaar." }
-          },
-          {
-            "@type": "Question",
-            "name": "Wat als mijn pand na 24 weken niet verkocht is?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Dan verleng je je plaatsing — opnieuw € 895, opnieuw 24 weken. Er is geen automatische verlenging en geen abonnement: je betaalt alleen als je zelf op de knop drukt." }
-          },
-          {
-            "@type": "Question",
-            "name": "Mag een makelaar op Panvia verkopen?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Nee. Panvia is uitsluitend voor eigenaren — bij plaatsing onderteken je een eigenaarsverklaring en controleren we het eigendom. Makelaars en andere dienstverleners mogen er niet verkopen of promoten; bij overtreding geldt een boete van € 10.000 per overtreding." }
-          },
-          {
-            "@type": "Question",
-            "name": "Kan ik ook een vakantiewoning of buitenlands vastgoed verkopen?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Ja. Elk soort vastgoed mag op Panvia: woningen, bedrijfspanden, beleggingen, portefeuilles en vakantiewoningen — in Nederland én daarbuiten. Bij buitenlands vastgoed verloopt de koop naar lokaal recht; dat staat dan bij de advertentie." }
-          },
-          {
-            "@type": "Question",
-            "name": "Wat doet Panvia niet?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Panvia taxeert niet, onderhandelt niet, loopt niet mee bij bezichtigingen en bemiddelt niet in hypotheken of financiering. Jij verkoopt zelf — Panvia zorgt dat je gevonden wordt en wijst je de weg naar de notaris." }
-          }
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.panvia.nl/#organisatie",
+      "name": "Panvia",
+      "url": "https://www.panvia.nl/",
+      "logo": "https://www.panvia.nl/img/og-panvia.png",
+      "slogan": "Vastgoed in eigen hand.",
+      "email": "hallo@panvia.nl",
+      "description": "Panvia is het platform waar eigenaren hun woning of bedrijfspand zelf verkopen, zonder makelaar en zonder courtage. Eén vast bedrag van € 895 voor 24 weken.",
+      "sameAs": [
+        "https://www.instagram.com/panvia.nl/",
+        "https://www.facebook.com/people/Panvia/61592451838010/",
+        "https://www.linkedin.com/company/panvianl/"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.panvia.nl/#website",
+      "url": "https://www.panvia.nl/",
+      "name": "Panvia",
+      "inLanguage": "nl-NL",
+      "publisher": {
+        "@id": "https://www.panvia.nl/#organisatie"
       }
-    ]
-  }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Mag ik mijn huis zonder makelaar verkopen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja. Een makelaar is nergens verplicht. De notaris is dat wél — die regelt de leveringsakte en de overdracht. Verder heb je nodig: een energielabel, je eigen verhaal en de wil om zelf met kopers te praten."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wat kost verkopen via Panvia?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Eén vast bedrag van € 895 exclusief btw per plaatsing van 24 weken. Liever spreiden? Dezelfde plaatsing kan ook per 4 weken (€ 150) of per week (€ 37,50), exclusief btw — verkoop je eerder, dan reken je eenmalig het restant tot € 895 af, nooit meer. Geen courtage, geen succesfee en geen verlenging zonder jouw akkoord. Ter vergelijking: een makelaar rekent doorgaans 1 à 2 procent van je verkoopprijs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wat kost Panvia voor kopers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Zoeken en kijken is gratis. Wil je met een eigenaar praten of een bod doen, dan neem je een kopersabonnement van € 12,95 per maand — geldig voor alle panden en maandelijks opzegbaar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wat als mijn pand na 24 weken niet verkocht is?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Dan verleng je je plaatsing — opnieuw € 895, opnieuw 24 weken. Er is geen automatische verlenging en geen abonnement: je betaalt alleen als je zelf op de knop drukt."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Mag een makelaar op Panvia verkopen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nee. Panvia is uitsluitend voor eigenaren — bij plaatsing onderteken je een eigenaarsverklaring en controleren we het eigendom. Makelaars en andere dienstverleners mogen er niet verkopen of promoten; bij overtreding geldt een boete van € 10.000 per overtreding."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kan ik ook een vakantiewoning of buitenlands vastgoed verkopen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja. Elk soort vastgoed mag op Panvia: woningen, bedrijfspanden, beleggingen, portefeuilles en vakantiewoningen — in Nederland én daarbuiten. Bij buitenlands vastgoed verloopt de koop naar lokaal recht; dat staat dan bij de advertentie."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wat doet Panvia niet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Panvia taxeert niet, onderhandelt niet, loopt niet mee bij bezichtigingen en bemiddelt niet in hypotheken of financiering. Jij verkoopt zelf — Panvia zorgt dat je gevonden wordt en wijst je de weg naar de notaris."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body data-page="home">
@@ -527,6 +555,7 @@
           <span class="woordmerk">Panvia</span>
           <span class="merk-tagline">Vastgoed in eigen hand.</span>
           <p class="klein" style="margin-top: 16px;">Van eigenaar naar koper. Voor woningen en commercieel vastgoed.</p>
+          <p class="klein" style="margin-top: 12px;"><a href="https://www.instagram.com/panvia.nl/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/people/Panvia/61592451838010/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.linkedin.com/company/panvianl/" target="_blank" rel="noopener">LinkedIn</a></p>
         </div>
         <div>
           <h3>Aanbod</h3>
