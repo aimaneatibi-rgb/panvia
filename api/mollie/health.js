@@ -24,6 +24,10 @@ module.exports = async function (req, res) {
        Stond die nog op alleen koper/verkoper, dan strandde élke
        projectbetaling ná het aanmaken van de Mollie-betaling. */
     projectSoorten: { ok: false, fout: null },
+    /* En laat diezelfde constraint de termijnbetalingen door? Zonder deze
+       migratie strandt elke week-/4-wekenplaatsing ná het aanmaken van de
+       Mollie-betaling, en kan het restant bij verkoop niet geboekt worden. */
+    termijnSoorten: { ok: false, fout: null },
     /* Staan de profiel-, zakelijke en Mollie-betalergegevens in het schema? */
     profielSchema: { ok: false, fout: null },
     mollie: { ok: false, fout: null },
@@ -58,6 +62,16 @@ module.exports = async function (req, res) {
     uitkomst.projectSoorten.ok = true;
   } catch (e) {
     uitkomst.projectSoorten.fout = String(e.message || e).slice(0, 200);
+  }
+
+  /* Idem voor de drie soorten van de betaalspreiding. */
+  try {
+    await schrijfTest("verkoper_week");
+    await schrijfTest("verkoper_4weken");
+    await schrijfTest("verkoper_aanvulling");
+    uitkomst.termijnSoorten.ok = true;
+  } catch (e) {
+    uitkomst.termijnSoorten.fout = String(e.message || e).slice(0, 200);
   }
 
   /* Auth-schema: bestaan de nieuwe kolommen en tabellen? Lezen is genoeg —
