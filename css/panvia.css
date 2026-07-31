@@ -2498,3 +2498,34 @@ body.scherm-verborgen .contactkaart-merk { color: rgba(15, 138, 92, .5); }
 .profiel-stap > p.grijs { margin: 0 0 var(--s-24); }
 .profiel-stap .veld { margin-bottom: var(--s-16); }
 .profiel-stap select { max-width: 360px; }
+
+/* ==========================================================================
+   21. Socials in de footer — merktekens als inline SVG, kleur volgt de tekst
+   ========================================================================== */
+.footer-socials {
+  display: flex;
+  gap: var(--s-16);
+  margin-top: var(--s-16);
+}
+.footer-socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--nacht-tekst);
+  background: rgba(255, 255, 255, .08);
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.footer-socials a:hover {
+  color: var(--nacht);
+  background: var(--wit);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+.footer-socials svg { width: 18px; height: 18px; display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .footer-socials a { transition: none; }
+  .footer-socials a:hover { transform: none; }
+}
