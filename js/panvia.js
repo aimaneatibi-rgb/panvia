@@ -3491,20 +3491,48 @@
   /* ------------------------------------------------------------------------
      Start
      ------------------------------------------------------------------------ */
-  /* Demo-melding: zolang het getoonde aanbod voorbeelden zijn, zeggen we dat
-     eerlijk bovenaan de pagina. Fictief aanbod tonen alsof het echt is, is
-     misleidend richting bezoekers én in strijd met advertentiebeleid. */
-  function initDemoMelding() {
-    if (!cfg("demoModus", false)) return;
+  /* Balk onder de header. Vóór de opening staat op élke pagina de
+     openingsdatum met de oproep om je pand aan te melden; daarna valt hij
+     terug op de demo-melding. Zolang het getoonde aanbod voorbeelden zijn,
+     zeggen we dat er hoe dan ook bij — fictief aanbod tonen alsof het echt
+     is misleidt bezoekers én botst met advertentiebeleid. */
+  var MAANDEN_EN = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+
+  function initAankondiging() {
+    var engels = document.documentElement.lang === "en";
     var pagina = document.body.getAttribute("data-page");
-    if (["aanbod", "zakelijk", "pand", "home"].indexOf(pagina) === -1) return;
+    var demoPagina = cfg("demoModus", false) &&
+      ["aanbod", "zakelijk", "pand", "home"].indexOf(pagina) !== -1;
+    var doel = parseLanceringsDatum();
+    var voorOpening = !!doel && doel.getTime() > Date.now();
+    if (!voorOpening && !demoPagina) return;
+
+    var link = engels ? "/en/list-your-property" : "/plaatsen";
+    var datum = engels && doel
+      ? doel.getDate() + " " + MAANDEN_EN[doel.getMonth()] + " " + doel.getFullYear()
+      : cfg("lanceringsDatumTekst", "");
+    var inhoud;
+
+    if (voorOpening) {
+      inhoud = engels
+        ? "<strong>Panvia opens on " + escapeHTML(datum) + ".</strong> From that day, this is where owners list their own property" +
+          (demoPagina ? " — what you see now are examples" : "") + ". " +
+          "<a href='" + link + "'>List your property now</a> and get free extra exposure in our launch campaign."
+        : "<strong>Panvia opent " + escapeHTML(datum) + ".</strong> Vanaf die dag staat hier het aanbod van eigenaren zelf" +
+          (demoPagina ? " — wat je nu ziet, zijn voorbeelden" : "") + ". " +
+          "<a href='" + link + "'>Meld je pand nu aan</a> en krijg gratis extra exposure in onze openingscampagne.";
+    } else {
+      inhoud = engels
+        ? "<strong>Example listings.</strong> The properties you see now are examples, to show how the platform works. " +
+          "<a href='" + link + "'>List your own property</a> — that one is real."
+        : "<strong>Voorbeeldaanbod.</strong> De panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
+          "<a href='" + link + "'>Meld je eigen pand aan</a> — dat is wel echt.";
+    }
+
     var balk = document.createElement("div");
-    balk.className = "demo-balk";
-    var datumTekst = cfg("lanceringsDatumTekst", "");
-    var opent = datumTekst ? "Panvia opent " + datumTekst : "Panvia opent binnenkort";
-    balk.innerHTML = "<div class='container'><strong>Voorbeeldaanbod.</strong> " + opent + "; " +
-      "de panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
-      "<a href='/plaatsen'>Meld je eigen pand aan</a> — dat is wel echt.</div>";
+    balk.className = voorOpening ? "demo-balk aankondiging" : "demo-balk";
+    balk.innerHTML = "<div class='container'>" + inhoud + "</div>";
     var header = $(".site-header");
     if (header && header.parentNode) header.parentNode.insertBefore(balk, header.nextSibling);
   }
@@ -3552,7 +3580,7 @@
     if (pagina === "gidsen") initGidsen();
     if (pagina === "gids") initGids();
     if (pagina === "contact") initContact();
-    initDemoMelding();
+    initAankondiging();
     initCountdown();
     initTelAnimatie();
     initReveal();

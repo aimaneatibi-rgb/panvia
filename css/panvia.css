@@ -1288,6 +1288,12 @@ legend {
 .demo-balk strong { color: var(--wit); }
 .demo-balk a { color: var(--wit); text-decoration: underline; }
 .demo-balk a:hover { color: var(--lucht); }
+/* Vóór de opening: dezelfde balk in het merkverloop, zodat de aankondiging
+   als mededeling van Panvia leest en niet als voetnoot. */
+.demo-balk.aankondiging {
+  background: linear-gradient(90deg, var(--ultramarijn), #101854);
+  color: rgba(255, 255, 255, .88);
+}
 
 /* Inlogpagina */
 .login-grid {
