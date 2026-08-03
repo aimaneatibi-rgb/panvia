@@ -3491,47 +3491,43 @@
   /* ------------------------------------------------------------------------
      Start
      ------------------------------------------------------------------------ */
-  /* Balk onder de header. Vóór de opening staat op élke pagina de
-     openingsdatum met de oproep om je pand aan te melden; daarna valt hij
-     terug op de demo-melding. Zolang het getoonde aanbod voorbeelden zijn,
-     zeggen we dat er hoe dan ook bij — fictief aanbod tonen alsof het echt
-     is misleidt bezoekers én botst met advertentiebeleid. */
+  /* Melding over voorbeeldaanbod. De aankondigingsbalk met de openingsdatum
+     is er op verzoek uit: de countdown in de hero vertelt dat verhaal al en
+     een balk bovenaan elke pagina duwde de site omlaag.
+     Wat blijft: zolang het getoonde aanbod voorbeelden zijn, zeggen we dat
+     erbij — fictief aanbod tonen alsof het echt is misleidt bezoekers én
+     botst met advertentiebeleid. Op de aanbodpagina's staat dat als balk
+     onder de header; op de home schuift het als regeltje bij "Uitgelicht
+     aanbod" zodat de bovenkant van de pagina schoon blijft. */
   var MAANDEN_EN = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
 
   function initAankondiging() {
-    var engels = document.documentElement.lang === "en";
+    if (!cfg("demoModus", false)) return;
     var pagina = document.body.getAttribute("data-page");
-    var demoPagina = cfg("demoModus", false) &&
-      ["aanbod", "zakelijk", "pand", "home"].indexOf(pagina) !== -1;
-    var doel = parseLanceringsDatum();
-    var voorOpening = !!doel && doel.getTime() > Date.now();
-    if (!voorOpening && !demoPagina) return;
+    if (["aanbod", "zakelijk", "pand", "home"].indexOf(pagina) === -1) return;
 
+    var engels = document.documentElement.lang === "en";
     var link = engels ? "/en/list-your-property" : "/plaatsen";
-    var datum = engels && doel
-      ? doel.getDate() + " " + MAANDEN_EN[doel.getMonth()] + " " + doel.getFullYear()
-      : cfg("lanceringsDatumTekst", "");
-    var inhoud;
+    var inhoud = engels
+      ? "<strong>Example listings.</strong> The properties you see now are examples, to show how the platform works. " +
+        "<a href='" + link + "'>List your own property</a> — that one is real."
+      : "<strong>Voorbeeldaanbod.</strong> De panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
+        "<a href='" + link + "'>Meld je eigen pand aan</a> — dat is wel echt.";
 
-    if (voorOpening) {
-      inhoud = engels
-        ? "<strong>Panvia opens on " + escapeHTML(datum) + ".</strong> From that day, this is where owners list their own property" +
-          (demoPagina ? " — what you see now are examples" : "") + ". " +
-          "<a href='" + link + "'>List your property now</a> and get free extra exposure in our launch campaign."
-        : "<strong>Panvia opent " + escapeHTML(datum) + ".</strong> Vanaf die dag staat hier het aanbod van eigenaren zelf" +
-          (demoPagina ? " — wat je nu ziet, zijn voorbeelden" : "") + ". " +
-          "<a href='" + link + "'>Meld je pand nu aan</a> en krijg gratis extra exposure in onze openingscampagne.";
-    } else {
-      inhoud = engels
-        ? "<strong>Example listings.</strong> The properties you see now are examples, to show how the platform works. " +
-          "<a href='" + link + "'>List your own property</a> — that one is real."
-        : "<strong>Voorbeeldaanbod.</strong> De panden die je nu ziet zijn voorbeelden om te laten zien hoe het platform werkt. " +
-          "<a href='" + link + "'>Meld je eigen pand aan</a> — dat is wel echt.";
+    /* Home: geen balk bovenaan, maar een notitie boven het uitgelichte grid. */
+    if (pagina === "home") {
+      var grid = document.getElementById("uitgelicht-grid");
+      if (!grid || !grid.parentNode) return;
+      var notitie = document.createElement("p");
+      notitie.className = "demo-notitie";
+      notitie.innerHTML = inhoud;
+      grid.parentNode.insertBefore(notitie, grid);
+      return;
     }
 
     var balk = document.createElement("div");
-    balk.className = voorOpening ? "demo-balk aankondiging" : "demo-balk";
+    balk.className = "demo-balk";
     balk.innerHTML = "<div class='container'>" + inhoud + "</div>";
     var header = $(".site-header");
     if (header && header.parentNode) header.parentNode.insertBefore(balk, header.nextSibling);
